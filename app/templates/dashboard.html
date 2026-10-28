@@ -6,38 +6,60 @@
     <meta name="description" content="CIIS School Intelligence AI — AI-powered intelligence dashboard for school management">
     <title>CIIS School Intelligence AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         :root {
+            /* CIIS Brand Palette */
             --pink: #D4146E;
-            --pink-light: #F8E1ED;
-            --pink-hover: #B01059;
-            --dark: #171717;
-            --dark-secondary: #2D2D2D;
+            --pink-light: #FDF2F8;
+            --pink-border: #FCE7F3;
+            --pink-hover: #BE123C;
+
+            /* Slate Neutral Foundation */
+            --dark: #0F172A;
+            --dark-secondary: #1E293B;
             --white: #FFFFFF;
-            --gray-50: #F9FAFB;
-            --gray-100: #F3F4F6;
-            --gray-200: #E5E7EB;
-            --gray-300: #D1D5DB;
-            --gray-400: #9CA3AF;
-            --gray-500: #6B7280;
-            --gray-600: #4B5563;
-            --gray-700: #374151;
+            --gray-50: #F8FAFC;
+            --gray-100: #F1F5F9;
+            --gray-200: #E2E8F0;
+            --gray-300: #CBD5E1;
+            --gray-400: #94A3B8;
+            --gray-500: #64748B;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1E293B;
+            --gray-900: #0F172A;
+
+            /* Clean Semantic Accents */
             --green: #059669;
-            --green-light: #D1FAE5;
+            --green-light: #ECFDF5;
+            --green-border: #A7F3D0;
+            --green-text: #065F46;
+
             --yellow: #D97706;
-            --yellow-light: #FEF3C7;
-            --red: #DC2626;
-            --red-light: #FEE2E2;
-            --blue: #2563EB;
-            --blue-light: #DBEAFE;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --yellow-light: #FFFBEB;
+            --yellow-border: #FDE68A;
+            --yellow-text: #92400E;
+
+            --red: #E11D48;
+            --red-light: #FFF1F2;
+            --red-border: #FECDD3;
+            --red-text: #9F1239;
+
+            --blue: #4F46E5;
+            --blue-light: #EEF2FF;
+            --blue-border: #C7D2FE;
+            --blue-text: #3730A3;
+
+            /* Elevation & Shape */
+            --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+            --shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+            --radius-sm: 6px;
             --radius: 8px;
             --radius-lg: 12px;
+            --radius-full: 9999px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -45,7 +67,7 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--gray-50);
-            color: var(--dark);
+            color: var(--gray-900);
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
         }
@@ -61,7 +83,8 @@
             color: var(--white);
             z-index: 100;
             overflow-y: auto;
-            transition: transform 0.3s ease;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border-right: 1px solid var(--dark-secondary);
         }
 
         .sidebar-header {
@@ -70,9 +93,10 @@
         }
 
         .sidebar-header h1 {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             letter-spacing: -0.02em;
+            color: var(--white);
         }
 
         .sidebar-header h1 span {
@@ -85,10 +109,11 @@
             margin-top: 4px;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            font-weight: 500;
         }
 
         .nav-section {
-            padding: 16px 0;
+            padding: 16px 0 8px;
         }
 
         .nav-section-title {
@@ -98,14 +123,14 @@
             color: var(--gray-500);
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 20px;
+            padding: 9px 20px;
             color: var(--gray-300);
             text-decoration: none;
             font-size: 13px;
@@ -116,18 +141,27 @@
         }
 
         .nav-item:hover {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.04);
             color: var(--white);
         }
 
         .nav-item.active {
-            background: rgba(212,20,110,0.1);
+            background: rgba(212, 20, 110, 0.08);
             color: var(--pink);
             border-left-color: var(--pink);
             font-weight: 500;
         }
 
-        .nav-item i { width: 18px; text-align: center; font-size: 14px; }
+        .nav-item svg {
+            width: 17px;
+            height: 17px;
+            flex-shrink: 0;
+            opacity: 0.85;
+        }
+
+        .nav-item.active svg {
+            opacity: 1;
+        }
 
         .nav-badge {
             margin-left: auto;
@@ -136,7 +170,8 @@
             font-size: 10px;
             font-weight: 600;
             padding: 2px 7px;
-            border-radius: 10px;
+            border-radius: var(--radius-full);
+            letter-spacing: 0.02em;
         }
 
         /* ─── Main Content ────────────────────────────────────── */
@@ -148,7 +183,7 @@
         .topbar {
             background: var(--white);
             border-bottom: 1px solid var(--gray-200);
-            padding: 16px 32px;
+            padding: 14px 32px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -158,56 +193,60 @@
         }
 
         .topbar-left h2 {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 600;
-            color: var(--dark);
+            color: var(--gray-900);
+            letter-spacing: -0.01em;
         }
 
         .topbar-left p {
             font-size: 12px;
             color: var(--gray-500);
-            margin-top: 2px;
+            margin-top: 1px;
         }
 
         .topbar-right {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
 
         .status-badge {
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
+            padding: 5px 11px;
+            border-radius: var(--radius-full);
             font-size: 12px;
             font-weight: 500;
+            border: 1px solid transparent;
         }
 
         .status-badge.online {
             background: var(--green-light);
-            color: var(--green);
+            color: var(--green-text);
+            border-color: var(--green-border);
         }
 
         .status-badge.offline {
             background: var(--red-light);
-            color: var(--red);
+            color: var(--red-text);
+            border-color: var(--red-border);
         }
 
         .status-dot {
-            width: 6px;
-            height: 6px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             background: currentColor;
         }
 
         .btn {
-            padding: 8px 16px;
+            padding: 7px 14px;
             border-radius: var(--radius);
             font-size: 13px;
             font-weight: 500;
-            border: none;
+            border: 1px solid transparent;
             cursor: pointer;
             transition: all 0.15s ease;
             display: inline-flex;
@@ -218,25 +257,45 @@
         .btn-primary {
             background: var(--pink);
             color: var(--white);
+            border-color: var(--pink);
         }
 
-        .btn-primary:hover { background: var(--pink-hover); }
+        .btn-primary:hover {
+            background: var(--pink-hover);
+            border-color: var(--pink-hover);
+        }
 
         .btn-outline {
             background: var(--white);
-            color: var(--gray-600);
-            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+            border-color: var(--gray-300);
         }
 
-        .btn-outline:hover { background: var(--gray-50); border-color: var(--gray-400); }
+        .btn-outline:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+            color: var(--gray-900);
+        }
 
-        .content { padding: 24px 32px; }
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            padding: 6px 10px;
+            cursor: pointer;
+            color: var(--gray-700);
+        }
+
+        .content {
+            padding: 24px 32px 48px;
+        }
 
         /* ─── Page Sections ───────────────────────────────────── */
         .page-section { display: none; }
         .page-section.active { display: block; }
 
-        /* ─── Cards ───────────────────────────────────────────── */
+        /* ─── Metric Cards ────────────────────────────────────── */
         .metric-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -250,48 +309,62 @@
             padding: 20px;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--gray-200);
-            transition: box-shadow 0.2s ease;
+            transition: all 0.2s ease;
         }
 
-        .metric-card:hover { box-shadow: var(--shadow-md); }
+        .metric-card:hover {
+            box-shadow: var(--shadow);
+            border-color: var(--gray-300);
+        }
 
-        .metric-card .metric-label {
-            font-size: 12px;
-            font-weight: 500;
+        .metric-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .metric-card .metric-label, .metric-title {
+            font-size: 11px;
+            font-weight: 600;
             color: var(--gray-500);
             text-transform: uppercase;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.04em;
         }
 
         .metric-card .metric-value {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
-            color: var(--dark);
-            margin: 6px 0 4px;
+            color: var(--gray-900);
+            margin: 4px 0 2px;
             letter-spacing: -0.02em;
         }
 
-        .metric-card .metric-detail {
+        .metric-card .metric-detail, .metric-subtext {
             font-size: 12px;
             color: var(--gray-500);
         }
 
         .metric-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 12px;
-            font-size: 18px;
+            border: 1px solid transparent;
         }
 
-        .metric-icon.pink { background: var(--pink-light); color: var(--pink); }
-        .metric-icon.green { background: var(--green-light); color: var(--green); }
-        .metric-icon.yellow { background: var(--yellow-light); color: var(--yellow); }
-        .metric-icon.blue { background: var(--blue-light); color: var(--blue); }
-        .metric-icon.red { background: var(--red-light); color: var(--red); }
+        .metric-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .metric-icon.pink { background: var(--pink-light); color: var(--pink); border-color: var(--pink-border); }
+        .metric-icon.green { background: var(--green-light); color: var(--green-text); border-color: var(--green-border); }
+        .metric-icon.yellow { background: var(--yellow-light); color: var(--yellow-text); border-color: var(--yellow-border); }
+        .metric-icon.blue { background: var(--blue-light); color: var(--blue-text); border-color: var(--blue-border); }
+        .metric-icon.red { background: var(--red-light); color: var(--red-text); border-color: var(--red-border); }
 
         /* ─── Panels ──────────────────────────────────────────── */
         .panel {
@@ -314,7 +387,16 @@
         .panel-header h3 {
             font-size: 14px;
             font-weight: 600;
-            color: var(--dark);
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-header h3 svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.85;
         }
 
         .panel-body { padding: 20px; }
@@ -335,62 +417,77 @@
 
         .data-table th {
             text-align: left;
-            padding: 10px 12px;
+            padding: 10px 14px;
             font-weight: 600;
-            color: var(--gray-600);
+            color: var(--gray-500);
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.04em;
-            border-bottom: 2px solid var(--gray-200);
+            border-bottom: 1px solid var(--gray-200);
+            background: var(--gray-50);
             white-space: nowrap;
         }
 
         .data-table td {
-            padding: 10px 12px;
+            padding: 11px 14px;
             border-bottom: 1px solid var(--gray-100);
             color: var(--gray-700);
+            vertical-align: middle;
         }
 
         .data-table tbody tr:hover {
             background: var(--gray-50);
         }
 
-        /* ─── Badges & Tags ───────────────────────────────────── */
+        /* ─── Clean Badges ────────────────────────────────────── */
         .badge {
             display: inline-flex;
             align-items: center;
-            padding: 3px 10px;
-            border-radius: 12px;
+            gap: 5px;
+            padding: 3px 9px;
+            border-radius: var(--radius-full);
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 500;
+            border: 1px solid transparent;
+            line-height: 1.3;
         }
 
-        .badge-high { background: var(--red-light); color: var(--red); }
-        .badge-medium { background: var(--yellow-light); color: var(--yellow); }
-        .badge-low { background: var(--green-light); color: var(--green); }
-        .badge-critical { background: #7C2D12; color: #FED7AA; }
-        .badge-new { background: var(--blue-light); color: var(--blue); }
-        .badge-active { background: var(--green-light); color: var(--green); }
+        .badge-high, .badge-critical {
+            background: var(--red-light);
+            color: var(--red-text);
+            border-color: var(--red-border);
+        }
+
+        .badge-medium {
+            background: var(--yellow-light);
+            color: var(--yellow-text);
+            border-color: var(--yellow-border);
+        }
+
+        .badge-low, .badge-active {
+            background: var(--green-light);
+            color: var(--green-text);
+            border-color: var(--green-border);
+        }
+
+        .badge-new {
+            background: var(--blue-light);
+            color: var(--blue-text);
+            border-color: var(--blue-border);
+        }
 
         .priority-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             display: inline-block;
             margin-right: 6px;
         }
 
-        .priority-dot.critical { background: #DC2626; }
+        .priority-dot.critical { background: var(--red); }
         .priority-dot.high { background: #EA580C; }
-        .priority-dot.medium { background: #D97706; }
-        .priority-dot.low { background: #059669; }
-
-        /* ─── Charts ──────────────────────────────────────────── */
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-height: 300px;
-        }
+        .priority-dot.medium { background: var(--yellow); }
+        .priority-dot.low { background: var(--green); }
 
         /* ─── Recommendation Cards ────────────────────────────── */
         .rec-card {
@@ -398,10 +495,14 @@
             border-radius: var(--radius);
             padding: 16px;
             margin-bottom: 12px;
-            transition: box-shadow 0.15s ease;
+            background: var(--white);
+            transition: all 0.15s ease;
         }
 
-        .rec-card:hover { box-shadow: var(--shadow-md); }
+        .rec-card:hover {
+            box-shadow: var(--shadow-sm);
+            border-color: var(--gray-300);
+        }
 
         .rec-card-header {
             display: flex;
@@ -413,69 +514,122 @@
         .rec-card-title {
             font-size: 14px;
             font-weight: 600;
-            color: var(--dark);
+            color: var(--gray-900);
             flex: 1;
+            display: flex;
+            align-items: center;
         }
 
         .rec-card-body {
             font-size: 13px;
             color: var(--gray-600);
             margin-bottom: 12px;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         .rec-card-meta {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 14px;
             font-size: 11px;
             color: var(--gray-500);
+            align-items: center;
         }
 
-        .rec-card-meta span { display: flex; align-items: center; gap: 4px; }
+        .rec-card-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
 
         .rec-action-btn {
             padding: 4px 10px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             font-size: 11px;
             font-weight: 500;
             border: 1px solid var(--gray-300);
             background: var(--white);
-            color: var(--gray-600);
+            color: var(--gray-700);
             cursor: pointer;
             transition: all 0.15s;
         }
 
-        .rec-action-btn:hover { border-color: var(--pink); color: var(--pink); }
+        .rec-action-btn:hover {
+            border-color: var(--pink);
+            color: var(--pink);
+            background: var(--pink-light);
+        }
 
-        /* ─── Model Health ────────────────────────────────────── */
+        /* ─── Feature Bars & Progress ─────────────────────────── */
+        .feature-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .feature-name {
+            width: 180px;
+            color: var(--gray-600);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .feature-bar-track {
+            flex: 1;
+            height: 7px;
+            background: var(--gray-100);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .feature-bar-fill {
+            height: 100%;
+            background: var(--pink);
+            border-radius: var(--radius-full);
+            transition: width 0.3s ease;
+        }
+
+        .feature-value {
+            width: 50px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        /* ─── Model & Metric Cards ────────────────────────────── */
         .model-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 20px;
             border: 1px solid var(--gray-200);
-            border-radius: var(--radius);
-            padding: 16px;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
         .model-card h4 {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
-            margin-bottom: 12px;
+            color: var(--gray-900);
             display: flex;
             align-items: center;
             gap: 8px;
+            margin-bottom: 14px;
         }
 
         .metrics-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
             gap: 12px;
+            margin-bottom: 12px;
         }
 
         .metric-mini {
-            text-align: center;
-            padding: 8px;
             background: var(--gray-50);
+            padding: 10px 12px;
             border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
         }
 
         .metric-mini .label {
@@ -483,158 +637,143 @@
             font-weight: 600;
             color: var(--gray-500);
             text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
         .metric-mini .value {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
-            color: var(--dark);
-            margin-top: 2px;
+            color: var(--gray-900);
+            margin-top: 3px;
         }
 
-        /* ─── Empty State ─────────────────────────────────────── */
+        /* ─── Empty & Loading States ──────────────────────────── */
         .empty-state {
             text-align: center;
-            padding: 48px 24px;
-            color: var(--gray-400);
+            padding: 40px 20px;
+            color: var(--gray-500);
         }
 
-        .empty-state i { font-size: 48px; margin-bottom: 16px; }
-        .empty-state h3 { font-size: 16px; font-weight: 600; color: var(--gray-600); margin-bottom: 8px; }
-        .empty-state p { font-size: 13px; max-width: 400px; margin: 0 auto; }
+        .empty-state svg {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 12px;
+            color: var(--gray-400);
+            stroke-width: 1.5;
+        }
 
-        /* ─── Loading ─────────────────────────────────────────── */
+        .empty-state h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 4px;
+        }
+
+        .empty-state p {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
         .loading-spinner {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 48px;
+            padding: 60px;
         }
 
         .spinner {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border: 3px solid var(--gray-200);
             border-top-color: var(--pink);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ─── Responsive ──────────────────────────────────────── */
-        .mobile-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--dark);
-            font-size: 20px;
-            cursor: pointer;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.open { transform: translateX(0); }
-            .main-content { margin-left: 0; }
-            .mobile-toggle { display: block; }
-            .topbar { padding: 12px 16px; }
-            .content { padding: 16px; }
-            .metric-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
-            .panel-grid { grid-template-columns: 1fr; }
-        }
-
-        /* ─── Feature Importance Bar ──────────────────────────── */
-        .feature-bar {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .feature-name {
-            width: 160px;
-            font-size: 12px;
-            color: var(--gray-600);
-            flex-shrink: 0;
-        }
-
-        .feature-bar-track {
-            flex: 1;
-            height: 20px;
-            background: var(--gray-100);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .feature-bar-fill {
-            height: 100%;
-            background: var(--pink);
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-
-        .feature-value {
-            width: 50px;
-            text-align: right;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--gray-700);
-            margin-left: 8px;
-        }
-
-        /* ─── Modal ─────────────────────────────────────────── */
+        /* ─── Modal Styles ────────────────────────────────────── */
         .modal-overlay {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(23, 23, 23, 0.65);
-            backdrop-filter: blur(4px);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(3px);
             z-index: 1000;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            animation: fadeIn 0.15s ease;
         }
+
         .modal-box {
             background: var(--white);
             border-radius: var(--radius-lg);
-            width: 100%;
-            max-width: 680px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
+            box-shadow: var(--shadow-lg);
             border: 1px solid var(--gray-200);
-            display: flex;
-            flex-direction: column;
-            animation: modalFadeIn 0.2s ease-out;
+            width: 100%;
+            max-width: 640px;
+            max-height: 88vh;
+            overflow-y: auto;
+            animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.96); }
-            to { opacity: 1; transform: scale(1); }
-        }
+
         .modal-header {
             padding: 18px 24px;
             border-bottom: 1px solid var(--gray-200);
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: var(--white);
+            z-index: 2;
         }
+
         .modal-body {
-            padding: 24px;
+            padding: 22px 24px;
         }
+
         .btn-close {
             background: none;
             border: none;
-            font-size: 24px;
             color: var(--gray-400);
             cursor: pointer;
-            padding: 4px 8px;
-            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
             border-radius: var(--radius);
+            transition: all 0.15s;
         }
-        .btn-close:hover { color: var(--dark); background: var(--gray-100); }
+
+        .btn-close:hover {
+            color: var(--gray-900);
+            background: var(--gray-100);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.97); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .mobile-toggle { display: block; }
+            .content { padding: 16px; }
+            .panel-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
-    <!-- Sidebar Navigation -->
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h1><span>CIIS</span> School Intelligence</h1>
@@ -644,31 +783,37 @@
         <nav class="nav-section">
             <div class="nav-section-title">Overview</div>
             <a class="nav-item active" data-page="overview" onclick="showPage('overview')">
-                <i class="fas fa-chart-line"></i> Executive Dashboard
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                Executive Dashboard
             </a>
         </nav>
 
         <nav class="nav-section">
             <div class="nav-section-title">Intelligence</div>
             <a class="nav-item" data-page="students" onclick="showPage('students')">
-                <i class="fas fa-user-graduate"></i> Student Intelligence
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Student Intelligence
                 <span class="nav-badge" id="nav-risk-count">—</span>
             </a>
             <a class="nav-item" data-page="classes" onclick="showPage('classes')">
-                <i class="fas fa-chalkboard"></i> Class & Subject
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                Class & Subject
             </a>
             <a class="nav-item" data-page="teachers" onclick="showPage('teachers')">
-                <i class="fas fa-user-tie"></i> Teacher Support
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>
+                Teacher Support
             </a>
             <a class="nav-item" data-page="forecasts" onclick="showPage('forecasts')">
-                <i class="fas fa-chart-area"></i> Forecasts
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                Forecasts
             </a>
         </nav>
 
         <nav class="nav-section">
             <div class="nav-section-title">Actions</div>
             <a class="nav-item" data-page="recommendations" onclick="showPage('recommendations')">
-                <i class="fas fa-lightbulb"></i> Recommendations
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                Recommendations
                 <span class="nav-badge" id="nav-rec-count">—</span>
             </a>
         </nav>
@@ -676,10 +821,12 @@
         <nav class="nav-section">
             <div class="nav-section-title">System</div>
             <a class="nav-item" data-page="model-health" onclick="showPage('model-health')">
-                <i class="fas fa-heartbeat"></i> Model Health
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>
+                Model Health
             </a>
             <a class="nav-item" data-page="data-quality" onclick="showPage('data-quality')">
-                <i class="fas fa-database"></i> Data Quality
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                Data Quality
             </a>
         </nav>
     </aside>
@@ -688,7 +835,9 @@
     <main class="main-content">
         <header class="topbar">
             <div style="display:flex;align-items:center;gap:12px;">
-                <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Navigation">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+                </button>
                 <div class="topbar-left">
                     <h2 id="page-title">Executive Dashboard</h2>
                     <p id="page-subtitle">School-wide intelligence overview</p>
@@ -700,7 +849,8 @@
                     <span>System Online</span>
                 </div>
                 <button class="btn btn-outline" onclick="refreshData()">
-                    <i class="fas fa-sync-alt"></i> Refresh
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+                    Refresh
                 </button>
             </div>
         </header>
@@ -716,7 +866,10 @@
                     <div class="panel-grid">
                         <div class="panel">
                             <div class="panel-header">
-                                <h3><i class="fas fa-user-graduate" style="color:var(--pink);margin-right:8px;"></i>Student Risk Distribution</h3>
+                                <h3>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    Student Risk Distribution
+                                </h3>
                             </div>
                             <div class="panel-body">
                                 <div class="chart-container"><canvas id="chart-risk-dist"></canvas></div>
@@ -724,7 +877,10 @@
                         </div>
                         <div class="panel">
                             <div class="panel-header">
-                                <h3><i class="fas fa-chart-bar" style="color:var(--blue);margin-right:8px;"></i>Performance by Grade Level</h3>
+                                <h3>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                                    Performance by Grade Level
+                                </h3>
                             </div>
                             <div class="panel-body">
                                 <div class="chart-container"><canvas id="chart-grade-perf"></canvas></div>
@@ -733,8 +889,11 @@
                     </div>
                     <div class="panel">
                         <div class="panel-header">
-                            <h3><i class="fas fa-lightbulb" style="color:var(--yellow);margin-right:8px;"></i>Priority Recommendations</h3>
-                            <a class="btn btn-outline" onclick="showPage('recommendations')" style="font-size:12px;">View All</a>
+                            <h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                                Priority Recommendations
+                            </h3>
+                            <a class="btn btn-outline" onclick="showPage('recommendations')" style="font-size:12px;padding:4px 10px;">View All</a>
                         </div>
                         <div class="panel-body" id="overview-recommendations"></div>
                     </div>
@@ -748,7 +907,7 @@
                     <div class="panel-header">
                         <h3>Students Needing Support Review</h3>
                         <div style="display:flex;gap:8px;">
-                            <select id="risk-filter" onchange="filterStudents()" class="btn btn-outline" style="font-size:12px;">
+                            <select id="risk-filter" onchange="filterStudents()" class="btn btn-outline" style="font-size:12px;padding:5px 10px;">
                                 <option value="">All Risk Levels</option>
                                 <option value="high">High Risk</option>
                                 <option value="medium">Medium Risk</option>
@@ -777,28 +936,43 @@
             <section class="page-section" id="page-classes">
                 <div class="panel-grid">
                     <div class="panel">
-                        <div class="panel-header"><h3>Subject Performance</h3></div>
+                        <div class="panel-header">
+                            <h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                                Subject Performance
+                            </h3>
+                        </div>
                         <div class="panel-body">
                             <div class="chart-container"><canvas id="chart-subjects"></canvas></div>
                         </div>
                     </div>
                     <div class="panel">
-                        <div class="panel-header"><h3>Attendance by Grade</h3></div>
+                        <div class="panel-header">
+                            <h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                                Attendance by Grade
+                            </h3>
+                        </div>
                         <div class="panel-body">
                             <div class="chart-container"><canvas id="chart-attendance-grade"></canvas></div>
                         </div>
                     </div>
                 </div>
                 <div class="panel">
-                    <div class="panel-header"><h3>Subjects Needing Attention</h3></div>
+                    <div class="panel-header">
+                        <h3>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+                            Subjects Needing Attention
+                        </h3>
+                    </div>
                     <div class="panel-body" id="struggling-subjects-container"></div>
                 </div>
             </section>
 
             <!-- ─── Teacher Support ─────────────────────────── -->
             <section class="page-section" id="page-teachers">
-                <div style="background:var(--blue-light);border:1px solid #93C5FD;border-radius:var(--radius);padding:14px 18px;margin-bottom:24px;font-size:13px;color:#1E40AF;display:flex;align-items:flex-start;gap:12px;">
-                    <i class="fas fa-info-circle" style="font-size:16px;margin-top:2px;flex-shrink:0;"></i>
+                <div style="background:var(--blue-light);border:1px solid var(--blue-border);border-radius:var(--radius);padding:14px 18px;margin-bottom:24px;font-size:13px;color:var(--blue-text);display:flex;align-items:flex-start;gap:12px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                     <div>
                         <strong>Ethical Teacher Support & Instructional Guidance:</strong>
                         This module uses Machine Learning to analyze faculty workload, multi-prep demands, class score diversity, and instructional trends.
@@ -813,13 +987,19 @@
                 <div class="panel-grid" style="margin-bottom:24px;">
                     <div class="panel">
                         <div class="panel-header">
-                            <h3><i class="fas fa-bullseye" style="color:var(--pink);margin-right:8px;"></i>Faculty Improvement Focus Areas (ML)</h3>
+                            <h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                                Faculty Improvement Focus Areas (ML)
+                            </h3>
                         </div>
                         <div class="panel-body" id="teacher-focus-areas-container"></div>
                     </div>
                     <div class="panel">
                         <div class="panel-header">
-                            <h3><i class="fas fa-graduation-cap" style="color:var(--blue);margin-right:8px;"></i>Recommended Professional Development</h3>
+                            <h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 2v20"/></svg>
+                                Recommended Professional Development
+                            </h3>
                         </div>
                         <div class="panel-body" id="teacher-workshops-container"></div>
                     </div>
@@ -829,12 +1009,15 @@
                 <div class="panel" style="margin-bottom:24px;">
                     <div class="panel-header" style="flex-wrap:wrap;gap:12px;">
                         <div>
-                            <h3 style="margin:0;"><i class="fas fa-chalkboard-teacher" style="color:var(--pink);margin-right:8px;"></i>Faculty Support Diagnostics & Action Plans</h3>
+                            <h3 style="margin:0;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>
+                                Faculty Support Diagnostics & Action Plans
+                            </h3>
                             <p style="font-size:12px;color:var(--gray-500);margin:3px 0 0;">Machine learning evaluation of classroom diversity, multi-prep load, and personalized improvement guidance.</p>
                         </div>
                         <div style="display:flex;gap:10px;align-items:center;">
-                            <input type="text" id="teacher-search" placeholder="Search teacher or subject..." class="form-control" style="font-size:12px;padding:6px 12px;border:1px solid var(--gray-300);border-radius:var(--radius);width:200px;" onkeyup="filterTeachersTable()">
-                            <select id="teacher-priority-filter" class="form-control" style="font-size:12px;padding:6px 10px;border:1px solid var(--gray-300);border-radius:var(--radius);" onchange="filterTeachersTable()">
+                            <input type="text" id="teacher-search" placeholder="Search teacher or subject..." class="form-control" style="font-size:12px;padding:6px 12px;border:1px solid var(--gray-300);border-radius:var(--radius);width:200px;outline:none;" onkeyup="filterTeachersTable()">
+                            <select id="teacher-priority-filter" class="form-control" style="font-size:12px;padding:6px 10px;border:1px solid var(--gray-300);border-radius:var(--radius);outline:none;" onchange="filterTeachersTable()">
                                 <option value="">All Priorities</option>
                                 <option value="high">Targeted Support</option>
                                 <option value="medium">Review & Co-Planning</option>
@@ -845,14 +1028,24 @@
                     <div class="panel-body" id="teacher-diagnostics-container"></div>
                 </div>
 
-                <!-- Existing Workload & Collaboration Panels -->
+                <!-- Workload & Collaboration Panels -->
                 <div class="panel-grid">
                     <div class="panel">
-                        <div class="panel-header"><h3><i class="fas fa-tasks" style="color:var(--gray-600);margin-right:8px;"></i>Workload & Capacity Overview</h3></div>
+                        <div class="panel-header">
+                            <h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--gray-600)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>
+                                Workload & Capacity Overview
+                            </h3>
+                        </div>
                         <div class="panel-body" id="teacher-workload-container"></div>
                     </div>
                     <div class="panel">
-                        <div class="panel-header"><h3><i class="fas fa-users" style="color:var(--green);margin-right:8px;"></i>Subject Collaboration Opportunities</h3></div>
+                        <div class="panel-header">
+                            <h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                Subject Collaboration Opportunities
+                            </h3>
+                        </div>
                         <div class="panel-body" id="collaboration-container"></div>
                     </div>
                 </div>
@@ -862,16 +1055,31 @@
             <section class="page-section" id="page-forecasts">
                 <div class="panel-grid">
                     <div class="panel">
-                        <div class="panel-header"><h3>Enrollment Summary</h3></div>
+                        <div class="panel-header">
+                            <h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                Enrollment Summary
+                            </h3>
+                        </div>
                         <div class="panel-body" id="enrollment-container"></div>
                     </div>
                     <div class="panel">
-                        <div class="panel-header"><h3>Enrollment Projection</h3></div>
+                        <div class="panel-header">
+                            <h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                                Enrollment Projection
+                            </h3>
+                        </div>
                         <div class="panel-body" id="forecast-container"></div>
                     </div>
                 </div>
                 <div class="panel">
-                    <div class="panel-header"><h3>Academic Progress by Grade</h3></div>
+                    <div class="panel-header">
+                        <h3>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                            Academic Progress by Grade
+                        </h3>
+                    </div>
                     <div class="panel-body">
                         <div class="chart-container"><canvas id="chart-academic-progress"></canvas></div>
                     </div>
@@ -885,16 +1093,17 @@
                     <div class="panel-header">
                         <h3>All Recommendations</h3>
                         <div style="display:flex;gap:8px;">
-                            <select id="rec-priority-filter" onchange="filterRecommendations()" class="btn btn-outline" style="font-size:12px;">
+                            <select id="rec-priority-filter" onchange="filterRecommendations()" class="btn btn-outline" style="font-size:12px;padding:5px 10px;">
                                 <option value="">All Priorities</option>
                                 <option value="critical">Critical</option>
                                 <option value="high">High</option>
                                 <option value="medium">Medium</option>
                                 <option value="low">Low</option>
                             </select>
-                            <select id="rec-area-filter" onchange="filterRecommendations()" class="btn btn-outline" style="font-size:12px;">
+                            <select id="rec-area-filter" onchange="filterRecommendations()" class="btn btn-outline" style="font-size:12px;padding:5px 10px;">
                                 <option value="">All Areas</option>
                                 <option value="student">Student</option>
+                                <option value="teacher_support">Teacher Support</option>
                                 <option value="class">Class</option>
                                 <option value="subject">Subject</option>
                                 <option value="school_operations">Operations</option>
@@ -917,7 +1126,60 @@
         </div>
     </main>
 
+    <!-- Teacher Improvement Plan Modal -->
+    <div id="teacher-modal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeTeacherModal()">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:40px;height:40px;border-radius:10px;background:var(--pink-light);color:var(--pink);border:1px solid var(--pink-border);display:flex;align-items:center;justify-content:center;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>
+                    </div>
+                    <div>
+                        <h3 id="modal-teacher-name" style="margin:0;font-size:16px;font-weight:700;color:var(--gray-900);">Teacher Name</h3>
+                        <p id="modal-teacher-subtitle" style="margin:2px 0 0;font-size:12px;color:var(--gray-500);">ID • Specialization • Experience</p>
+                    </div>
+                </div>
+                <button class="btn-close" onclick="closeTeacherModal()" aria-label="Close modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-teacher-body">
+                <!-- Content dynamically injected -->
+            </div>
+        </div>
+    </div>
+
     <script>
+    // ─── Clean SVG Icon Helper ────────────────────────────────────────────
+    const SVG_ICONS = {
+        students: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+        calendar: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>`,
+        trend: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`,
+        check: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`,
+        alert: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`,
+        warning: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`,
+        target: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`,
+        book: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 2v20"/></svg>`,
+        info: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+        award: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>`,
+        sparkles: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`,
+        sliders: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>`,
+        user: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+        clock: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+        tag: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><circle cx="7" cy="7" r=".5" fill="currentColor"/></svg>`,
+        table: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>`,
+        zap: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+        box: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`,
+        teachers: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>`,
+        clipboard: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>`,
+        share: `<svg width="size" height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>`
+    };
+
+    function icon(name, size = 16) {
+        const svgTpl = SVG_ICONS[name] || SVG_ICONS.info;
+        return svgTpl.replace(/size/g, size);
+    }
+
     // ─── State ───────────────────────────────────────────────────────────
     let dashboardData = {};
     let allPredictions = [];
@@ -929,7 +1191,7 @@
         'overview': ['Executive Dashboard', 'School-wide intelligence overview'],
         'students': ['Student Intelligence', 'Risk predictions and support recommendations'],
         'classes': ['Class & Subject Analytics', 'Performance trends and comparisons'],
-        'teachers': ['Teacher Support', 'Workload and collaboration insights'],
+        'teachers': ['Teacher Support', 'Workload and instructional diagnostics'],
         'forecasts': ['Forecasts', 'Enrollment projections and academic progress'],
         'recommendations': ['Recommendations', 'Evidence-based action items'],
         'model-health': ['Model Health', 'ML model status and evaluation metrics'],
@@ -940,15 +1202,18 @@
         document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
-        document.getElementById('page-' + page).classList.add('active');
-        document.querySelector(`[data-page="${page}"]`).classList.add('active');
+        const targetPage = document.getElementById('page-' + page);
+        const targetNav = document.querySelector(`[data-page="${page}"]`);
+        if (targetPage) targetPage.classList.add('active');
+        if (targetNav) targetNav.classList.add('active');
 
         const [title, subtitle] = pageTitles[page] || ['', ''];
         document.getElementById('page-title').textContent = title;
         document.getElementById('page-subtitle').textContent = subtitle;
 
-        // Close mobile sidebar
-        document.getElementById('sidebar').classList.remove('open');
+        // Close mobile sidebar if open
+        const sb = document.getElementById('sidebar');
+        if (sb) sb.classList.remove('open');
     }
 
     function toggleSidebar() {
@@ -1029,32 +1294,42 @@
         const m = o.school_metrics || {};
         const metricsHtml = `
             <div class="metric-card">
-                <div class="metric-icon pink"><i class="fas fa-user-graduate"></i></div>
-                <div class="metric-label">Total Students</div>
+                <div class="metric-header">
+                    <span class="metric-label">Total Students</span>
+                    <div class="metric-icon pink">${icon('students', 18)}</div>
+                </div>
                 <div class="metric-value">${m.total_students || 0}</div>
                 <div class="metric-detail">Active enrollment</div>
             </div>
             <div class="metric-card">
-                <div class="metric-icon green"><i class="fas fa-calendar-check"></i></div>
-                <div class="metric-label">Attendance Rate</div>
+                <div class="metric-header">
+                    <span class="metric-label">Attendance Rate</span>
+                    <div class="metric-icon green">${icon('calendar', 18)}</div>
+                </div>
                 <div class="metric-value">${m.attendance_rate ? m.attendance_rate + '%' : 'N/A'}</div>
                 <div class="metric-detail">School-wide average</div>
             </div>
             <div class="metric-card">
-                <div class="metric-icon blue"><i class="fas fa-chart-line"></i></div>
-                <div class="metric-label">Average Grade</div>
+                <div class="metric-header">
+                    <span class="metric-label">Average Grade</span>
+                    <div class="metric-icon blue">${icon('trend', 18)}</div>
+                </div>
                 <div class="metric-value">${m.avg_grade ? m.avg_grade + '%' : 'N/A'}</div>
                 <div class="metric-detail">All subjects combined</div>
             </div>
             <div class="metric-card">
-                <div class="metric-icon yellow"><i class="fas fa-check-circle"></i></div>
-                <div class="metric-label">Pass Rate</div>
+                <div class="metric-header">
+                    <span class="metric-label">Pass Rate</span>
+                    <div class="metric-icon yellow">${icon('check', 18)}</div>
+                </div>
                 <div class="metric-value">${m.pass_rate ? m.pass_rate + '%' : 'N/A'}</div>
                 <div class="metric-detail">Above 75% threshold</div>
             </div>
             <div class="metric-card">
-                <div class="metric-icon red"><i class="fas fa-exclamation-triangle"></i></div>
-                <div class="metric-label">Students Needing Review</div>
+                <div class="metric-header">
+                    <span class="metric-label">Students Needing Review</span>
+                    <div class="metric-icon red">${icon('warning', 18)}</div>
+                </div>
                 <div class="metric-value">${(o.student_risk_summary?.high || 0)}</div>
                 <div class="metric-detail">High risk identified</div>
             </div>
@@ -1085,7 +1360,7 @@
                 labels: ['Low Risk', 'Medium Risk', 'High Risk'],
                 datasets: [{
                     data: [risk.low || 0, risk.medium || 0, risk.high || 0],
-                    backgroundColor: ['#059669', '#D97706', '#DC2626'],
+                    backgroundColor: ['#059669', '#D97706', '#E11D48'],
                     borderWidth: 0,
                     hoverOffset: 6,
                 }]
@@ -1120,7 +1395,7 @@
                     {
                         label: 'Pass Rate %',
                         data: data.map(d => d.pass_rate),
-                        backgroundColor: '#2563EB',
+                        backgroundColor: '#4F46E5',
                         borderRadius: 4,
                     }
                 ]
@@ -1130,7 +1405,7 @@
                 maintainAspectRatio: true,
                 plugins: { legend: { position: 'bottom', labels: { font: { size: 12, family: 'Inter' } } } },
                 scales: {
-                    y: { beginAtZero: true, max: 100, grid: { color: '#F3F4F6' } },
+                    y: { beginAtZero: true, max: 100, grid: { color: '#F1F5F9' } },
                     x: { grid: { display: false } },
                 }
             }
@@ -1145,26 +1420,34 @@
 
         document.getElementById('student-metrics').innerHTML = `
             <div class="metric-card">
-                <div class="metric-icon red"><i class="fas fa-exclamation-circle"></i></div>
-                <div class="metric-label">High Risk</div>
+                <div class="metric-header">
+                    <span class="metric-label">High Risk</span>
+                    <div class="metric-icon red">${icon('alert', 18)}</div>
+                </div>
                 <div class="metric-value">${high}</div>
                 <div class="metric-detail">Immediate review recommended</div>
             </div>
             <div class="metric-card">
-                <div class="metric-icon yellow"><i class="fas fa-exclamation-triangle"></i></div>
-                <div class="metric-label">Medium Risk</div>
+                <div class="metric-header">
+                    <span class="metric-label">Medium Risk</span>
+                    <div class="metric-icon yellow">${icon('warning', 18)}</div>
+                </div>
                 <div class="metric-value">${medium}</div>
                 <div class="metric-detail">Monitoring recommended</div>
             </div>
             <div class="metric-card">
-                <div class="metric-icon green"><i class="fas fa-check-circle"></i></div>
-                <div class="metric-label">Low Risk</div>
+                <div class="metric-header">
+                    <span class="metric-label">Low Risk</span>
+                    <div class="metric-icon green">${icon('check', 18)}</div>
+                </div>
                 <div class="metric-value">${low}</div>
                 <div class="metric-detail">On track</div>
             </div>
             <div class="metric-card">
-                <div class="metric-icon blue"><i class="fas fa-users"></i></div>
-                <div class="metric-label">Total Analyzed</div>
+                <div class="metric-header">
+                    <span class="metric-label">Total Analyzed</span>
+                    <div class="metric-icon blue">${icon('students', 18)}</div>
+                </div>
                 <div class="metric-value">${allPredictions.length}</div>
                 <div class="metric-detail">Active students</div>
             </div>
@@ -1178,7 +1461,6 @@
         let filtered = allPredictions;
         if (filter) filtered = filtered.filter(p => p.risk_level === filter);
 
-        // Sort by score descending
         filtered.sort((a, b) => (b.prediction_score || 0) - (a.prediction_score || 0));
 
         const tbody = document.getElementById('student-table-body');
@@ -1201,7 +1483,6 @@
 
     // ─── Classes ─────────────────────────────────────────────────────────
     function renderClasses() {
-        // Subject performance chart
         const subjects = dashboardData.subjects?.subjects || [];
         if (subjects.length && !charts['subjects']) {
             const ctx = document.getElementById('chart-subjects');
@@ -1212,7 +1493,7 @@
                     datasets: [{
                         label: 'Average Score',
                         data: subjects.map(s => s.avg_score),
-                        backgroundColor: subjects.map(s => s.avg_score < 70 ? '#DC2626' : s.avg_score < 75 ? '#D97706' : '#D4146E'),
+                        backgroundColor: subjects.map(s => s.avg_score < 70 ? '#E11D48' : s.avg_score < 75 ? '#D97706' : '#D4146E'),
                         borderRadius: 4,
                     }]
                 },
@@ -1222,14 +1503,13 @@
                     maintainAspectRatio: true,
                     plugins: { legend: { display: false } },
                     scales: {
-                        x: { beginAtZero: true, max: 100, grid: { color: '#F3F4F6' } },
+                        x: { beginAtZero: true, max: 100, grid: { color: '#F1F5F9' } },
                         y: { grid: { display: false } },
                     }
                 }
             });
         }
 
-        // Attendance by grade chart
         const attData = dashboardData.attendance?.grades || [];
         if (attData.length && !charts['attGrade']) {
             const ctx = document.getElementById('chart-attendance-grade');
@@ -1240,7 +1520,7 @@
                     datasets: [
                         { label: 'Attendance %', data: attData.map(a => a.attendance_rate), backgroundColor: '#059669', borderRadius: 4 },
                         { label: 'Late %', data: attData.map(a => a.late_rate), backgroundColor: '#D97706', borderRadius: 4 },
-                        { label: 'Absent %', data: attData.map(a => a.absence_rate), backgroundColor: '#DC2626', borderRadius: 4 },
+                        { label: 'Absent %', data: attData.map(a => a.absence_rate), backgroundColor: '#E11D48', borderRadius: 4 },
                     ]
                 },
                 options: {
@@ -1248,18 +1528,17 @@
                     maintainAspectRatio: true,
                     plugins: { legend: { position: 'bottom', labels: { font: { size: 12, family: 'Inter' } } } },
                     scales: {
-                        y: { beginAtZero: true, grid: { color: '#F3F4F6' } },
+                        y: { beginAtZero: true, grid: { color: '#F1F5F9' } },
                         x: { grid: { display: false } },
                     }
                 }
             });
         }
 
-        // Struggling subjects
         const struggling = dashboardData.struggling?.struggling_subjects || [];
         const container = document.getElementById('struggling-subjects-container');
         if (!struggling.length) {
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle"></i><h3>No Critical Subjects</h3><p>All subjects are within acceptable performance ranges.</p></div>';
+            container.innerHTML = `<div class="empty-state">${icon('check', 36)}<h3>No Critical Subjects</h3><p>All subjects are within acceptable performance ranges.</p></div>`;
         } else {
             container.innerHTML = `<table class="data-table"><thead><tr>
                 <th>Grade</th><th>Subject</th><th>% Below Threshold</th><th>Struggling / Total</th><th>Avg Score</th><th>Severity</th>
@@ -1290,7 +1569,7 @@
                 <div class="metric-card">
                     <div class="metric-header">
                         <span class="metric-title">Faculty Analyzed</span>
-                        <div class="metric-icon" style="background:var(--blue-light);color:var(--blue);"><i class="fas fa-users"></i></div>
+                        <div class="metric-icon blue">${icon('teachers', 18)}</div>
                     </div>
                     <div class="metric-value">${teacherML.length}</div>
                     <div class="metric-subtext">Active teaching staff</div>
@@ -1298,7 +1577,7 @@
                 <div class="metric-card">
                     <div class="metric-header">
                         <span class="metric-title">Targeted Support</span>
-                        <div class="metric-icon" style="background:var(--pink-light);color:var(--pink);"><i class="fas fa-hands-helping"></i></div>
+                        <div class="metric-icon pink">${icon('target', 18)}</div>
                     </div>
                     <div class="metric-value" style="color:var(--pink);">${highCount}</div>
                     <div class="metric-subtext">Multi-prep or classroom pacing strain</div>
@@ -1306,7 +1585,7 @@
                 <div class="metric-card">
                     <div class="metric-header">
                         <span class="metric-title">Co-Planning Review</span>
-                        <div class="metric-icon" style="background:var(--yellow-light);color:var(--yellow);"><i class="fas fa-clipboard-list"></i></div>
+                        <div class="metric-icon yellow">${icon('clipboard', 18)}</div>
                     </div>
                     <div class="metric-value">${medCount}</div>
                     <div class="metric-subtext">Moderate workload / mixed-ability</div>
@@ -1314,7 +1593,7 @@
                 <div class="metric-card">
                     <div class="metric-header">
                         <span class="metric-title">Peer Mentor Candidates</span>
-                        <div class="metric-icon" style="background:var(--green-light);color:var(--green);"><i class="fas fa-award"></i></div>
+                        <div class="metric-icon green">${icon('award', 18)}</div>
                     </div>
                     <div class="metric-value" style="color:var(--green);">${lowCount}</div>
                     <div class="metric-subtext">Experienced faculty coaches</div>
@@ -1334,8 +1613,8 @@
                     const pct = Math.round((count / total) * 100);
                     return `
                         <div class="feature-bar" style="margin-bottom:12px;">
-                            <div class="feature-name" style="width:220px;font-weight:600;color:var(--dark);font-size:12px;">${area}</div>
-                            <div class="feature-bar-track" style="height:14px;">
+                            <div class="feature-name" style="width:220px;font-weight:600;color:var(--gray-900);font-size:12px;">${area}</div>
+                            <div class="feature-bar-track" style="height:8px;">
                                 <div class="feature-bar-fill" style="width:${pct}%;background:${pct > 25 ? 'var(--pink)' : 'var(--blue)'};"></div>
                             </div>
                             <div class="feature-value" style="width:60px;font-size:12px;">${count} (${pct}%)</div>
@@ -1355,8 +1634,9 @@
                 workshopsContainer.innerHTML = workshops.map(w => `
                     <div class="rec-card" style="margin-bottom:10px;padding:12px 14px;">
                         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-                            <div style="font-weight:700;font-size:13px;color:var(--dark);">
-                                <i class="fas fa-graduation-cap" style="color:var(--blue);margin-right:6px;"></i>${w.workshop_title}
+                            <div style="font-weight:600;font-size:13px;color:var(--gray-900);display:flex;align-items:center;gap:6px;">
+                                <span style="color:var(--blue);">${icon('book', 15)}</span>
+                                ${w.workshop_title}
                             </div>
                             <span class="badge badge-medium" style="font-size:11px;">${w.target_faculty_count} faculty</span>
                         </div>
@@ -1373,7 +1653,7 @@
         // 4. Diagnostics Table
         renderTeacherTable(teacherML);
 
-        // 5. Existing Workload & Collaboration
+        // 5. Workload & Collaboration
         const workload = dashboardData.workload?.teachers || [];
         const wlContainer = document.getElementById('teacher-workload-container');
         if (wlContainer) {
@@ -1398,9 +1678,12 @@
             if (collab.length) {
                 collabContainer.innerHTML = collab.map(c => `
                     <div class="rec-card">
-                        <div class="rec-card-title"><i class="fas fa-handshake" style="color:var(--blue);margin-right:8px;"></i>${c.subject}</div>
+                        <div class="rec-card-title" style="color:var(--gray-900);">
+                            <span style="color:var(--blue);margin-right:6px;">${icon('share', 15)}</span>
+                            ${c.subject}
+                        </div>
                         <div class="rec-card-body">${c.n_teachers} teachers: ${c.teacher_names.join(', ')}</div>
-                        <div class="rec-card-meta"><span><i class="fas fa-lightbulb"></i> ${c.suggestion}</span></div>
+                        <div class="rec-card-meta"><span>${icon('sparkles', 13)} ${c.suggestion}</span></div>
                     </div>
                 `).join('');
             } else {
@@ -1470,8 +1753,8 @@
                                     <span class="badge ${badgeClass}">${priLabel}</span>
                                 </td>
                                 <td style="text-align:center;">
-                                    <button class="btn btn-sm" style="background:var(--pink);color:var(--white);padding:5px 10px;font-size:11px;font-weight:600;border:none;border-radius:var(--radius);cursor:pointer;" onclick="openTeacherPlanModal('${t.teacher_id}')">
-                                        <i class="fas fa-lightbulb" style="margin-right:4px;"></i> View Plan
+                                    <button class="btn btn-primary" style="padding:5px 11px;font-size:11px;font-weight:500;" onclick="openTeacherPlanModal('${t.teacher_id}')">
+                                        ${icon('sparkles', 13)} View Plan
                                     </button>
                                 </td>
                             </tr>
@@ -1520,25 +1803,25 @@
         const body = document.getElementById('modal-teacher-body');
         body.innerHTML = `
             <!-- Priority & Focus Area Banner -->
-            <div style="background:rgba(212,20,110,0.06);border-left:4px solid var(--pink);padding:14px 18px;border-radius:4px;margin-bottom:20px;">
+            <div style="background:var(--pink-light);border-left:4px solid var(--pink);padding:14px 18px;border-radius:4px;margin-bottom:20px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                     <div style="font-size:11px;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:0.5px;">Primary Improvement Focus Area</div>
                     ${priBadge}
                 </div>
-                <div style="font-size:16px;font-weight:800;color:var(--dark);margin-bottom:4px;">${plan.primary_focus_area || 'Instructional Support'}</div>
+                <div style="font-size:15px;font-weight:700;color:var(--gray-900);margin-bottom:3px;">${plan.primary_focus_area || 'Instructional Support'}</div>
                 <div style="font-size:12px;color:var(--gray-600);">${t.support_category}</div>
             </div>
 
             <!-- Contributing Classroom Factors -->
             <div style="margin-bottom:20px;">
-                <h4 style="font-size:13px;font-weight:700;color:var(--gray-700);margin:0 0 10px;text-transform:uppercase;letter-spacing:0.5px;">
-                    <i class="fas fa-microscope" style="color:var(--blue);margin-right:6px;"></i>ML Diagnostic Factors
+                <h4 style="font-size:12px;font-weight:700;color:var(--gray-700);margin:0 0 10px;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:6px;">
+                    <span style="color:var(--blue);">${icon('sliders', 14)}</span> ML Diagnostic Factors
                 </h4>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                     ${factors.map(f => `
                         <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius);padding:10px 12px;">
                             <div style="font-size:11px;color:var(--gray-500);font-weight:600;">${f.factor}</div>
-                            <div style="font-size:13px;font-weight:700;color:var(--dark);margin-top:2px;">${f.value}</div>
+                            <div style="font-size:13px;font-weight:700;color:var(--gray-900);margin-top:2px;">${f.value}</div>
                         </div>
                     `).join('') || '<div style="font-size:12px;color:var(--gray-500);">Standard classroom workload metrics.</div>'}
                 </div>
@@ -1546,30 +1829,33 @@
 
             <!-- Concrete Action Steps -->
             <div style="margin-bottom:20px;">
-                <h4 style="font-size:13px;font-weight:700;color:var(--gray-700);margin:0 0 10px;text-transform:uppercase;letter-spacing:0.5px;">
-                    <i class="fas fa-check-circle" style="color:var(--green);margin-right:6px;"></i>Concrete Actions to Improve
+                <h4 style="font-size:12px;font-weight:700;color:var(--gray-700);margin:0 0 10px;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:6px;">
+                    <span style="color:var(--green);">${icon('check', 14)}</span> Concrete Actions to Improve
                 </h4>
-                <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.6;color:var(--dark);">
+                <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.6;color:var(--gray-800);">
                     ${(plan.specific_actions || []).map(act => `<li style="margin-bottom:6px;">${act}</li>`).join('')}
                 </ul>
             </div>
 
             <!-- Recommended PD Workshop & Target Outcome -->
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-                <div style="background:var(--blue-light);border:1px solid #BFDBFE;border-radius:var(--radius);padding:12px 14px;">
-                    <div style="font-size:11px;font-weight:700;color:#1E40AF;text-transform:uppercase;">Recommended PD Workshop</div>
-                    <div style="font-size:13px;font-weight:700;color:#1E3A8A;margin-top:4px;">${plan.recommended_pd_workshop || 'Continuous Teaching Improvement'}</div>
+                <div style="background:var(--blue-light);border:1px solid var(--blue-border);border-radius:var(--radius);padding:12px 14px;">
+                    <div style="font-size:11px;font-weight:700;color:var(--blue-text);text-transform:uppercase;">Recommended PD Workshop</div>
+                    <div style="font-size:13px;font-weight:600;color:var(--blue-text);margin-top:4px;">${plan.recommended_pd_workshop || 'Continuous Teaching Improvement'}</div>
                 </div>
-                <div style="background:var(--green-light);border:1px solid #BBF7D0;border-radius:var(--radius);padding:12px 14px;">
-                    <div style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;">Target Measurable Outcome</div>
-                    <div style="font-size:12px;font-weight:600;color:#14532D;margin-top:4px;">${plan.target_measurable_outcome || 'Consistent student pass rate'}</div>
+                <div style="background:var(--green-light);border:1px solid var(--green-border);border-radius:var(--radius);padding:12px 14px;">
+                    <div style="font-size:11px;font-weight:700;color:var(--green-text);text-transform:uppercase;">Target Measurable Outcome</div>
+                    <div style="font-size:12px;font-weight:500;color:var(--green-text);margin-top:4px;">${plan.target_measurable_outcome || 'Consistent student pass rate'}</div>
                 </div>
             </div>
 
-            <!-- Review Timeline & Disclaimer -->
+            <!-- Review Timeline & Model Version -->
             <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--gray-200);font-size:12px;color:var(--gray-500);">
-                <span><i class="fas fa-calendar-alt" style="margin-right:4px;"></i>Review Timeline: <strong>${plan.suggested_review_timeline || '6-8 Weeks'}</strong></span>
-                <span style="font-style:italic;">Model ${t.model_version}</span>
+                <span style="display:flex;align-items:center;gap:5px;">
+                    ${icon('calendar', 13)}
+                    Review Timeline: <strong style="color:var(--gray-700);">${plan.suggested_review_timeline || '6-8 Weeks'}</strong>
+                </span>
+                <span style="font-size:11px;">Model ${t.model_version}</span>
             </div>
         `;
 
@@ -1611,20 +1897,19 @@
                 <tbody>${(forecast.projections || []).map(p => `<tr>
                     <td>${p.period}</td><td>${p.projected_enrollment}</td><td style="font-size:11px;color:var(--gray-500);">${p.confidence}</td>
                 </tr>`).join('')}</tbody></table>
-                <div style="margin-top:12px;padding:12px;background:var(--yellow-light);border-radius:var(--radius);font-size:12px;color:#92400E;">
+                <div style="margin-top:12px;padding:12px;background:var(--yellow-light);border:1px solid var(--yellow-border);border-radius:var(--radius);font-size:12px;color:var(--yellow-text);">
                     <strong>Assumptions:</strong><br>${(forecast.assumptions || []).map(a => '• ' + a).join('<br>')}
                 </div>
             `;
         }
 
-        // Academic progress chart
         const progress = dashboardData.progress?.progress || [];
         if (progress.length && !charts['progress']) {
             const ctx = document.getElementById('chart-academic-progress');
             const datasets = progress.map((g, i) => ({
                 label: `Grade ${g.grade_level}`,
                 data: (g.periods || []).map(p => p.avg_score),
-                borderColor: ['#D4146E', '#2563EB', '#059669', '#D97706', '#7C3AED', '#DC2626'][i % 6],
+                borderColor: ['#D4146E', '#4F46E5', '#059669', '#D97706', '#7C3AED', '#E11D48'][i % 6],
                 backgroundColor: 'transparent',
                 tension: 0.3,
                 pointRadius: 4,
@@ -1639,7 +1924,7 @@
                     maintainAspectRatio: true,
                     plugins: { legend: { position: 'bottom', labels: { font: { size: 12, family: 'Inter' } } } },
                     scales: {
-                        y: { beginAtZero: false, grid: { color: '#F3F4F6' } },
+                        y: { beginAtZero: false, grid: { color: '#F1F5F9' } },
                         x: { grid: { display: false } },
                     }
                 }
@@ -1654,24 +1939,36 @@
 
         document.getElementById('rec-metrics').innerHTML = `
             <div class="metric-card">
-                <div class="metric-icon red"><i class="fas fa-fire"></i></div>
-                <div class="metric-label">Critical</div>
+                <div class="metric-header">
+                    <span class="metric-label">Critical Priority</span>
+                    <div class="metric-icon red">${icon('alert', 18)}</div>
+                </div>
                 <div class="metric-value">${byPriority.critical || 0}</div>
+                <div class="metric-detail">Urgent school attention</div>
             </div>
             <div class="metric-card">
-                <div class="metric-icon yellow"><i class="fas fa-flag"></i></div>
-                <div class="metric-label">High Priority</div>
+                <div class="metric-header">
+                    <span class="metric-label">High Priority</span>
+                    <div class="metric-icon yellow">${icon('warning', 18)}</div>
+                </div>
                 <div class="metric-value">${byPriority.high || 0}</div>
+                <div class="metric-detail">Targeted intervention</div>
             </div>
             <div class="metric-card">
-                <div class="metric-icon blue"><i class="fas fa-bookmark"></i></div>
-                <div class="metric-label">Medium</div>
+                <div class="metric-header">
+                    <span class="metric-label">Medium Priority</span>
+                    <div class="metric-icon blue">${icon('sliders', 18)}</div>
+                </div>
                 <div class="metric-value">${byPriority.medium || 0}</div>
+                <div class="metric-detail">Review and monitoring</div>
             </div>
             <div class="metric-card">
-                <div class="metric-icon green"><i class="fas fa-leaf"></i></div>
-                <div class="metric-label">Low</div>
+                <div class="metric-header">
+                    <span class="metric-label">Low Priority</span>
+                    <div class="metric-icon green">${icon('check', 18)}</div>
+                </div>
                 <div class="metric-value">${byPriority.low || 0}</div>
+                <div class="metric-detail">Routine improvement</div>
             </div>
         `;
 
@@ -1689,7 +1986,7 @@
         const container = document.getElementById('recommendations-container');
         container.innerHTML = filtered.length
             ? filtered.map(r => renderRecCard(r)).join('')
-            : '<div class="empty-state"><i class="fas fa-check-circle"></i><h3>No recommendations match your filter</h3></div>';
+            : `<div class="empty-state">${icon('check', 36)}<h3>No recommendations match your filter</h3></div>`;
     }
 
     function renderRecCard(r) {
@@ -1699,16 +1996,16 @@
                     <span class="priority-dot ${r.priority}"></span>
                     ${r.title}
                 </div>
-                <span class="badge badge-${r.priority}">${r.priority}</span>
+                <span class="badge badge-${r.priority}">${r.priority.toUpperCase()}</span>
             </div>
             <div class="rec-card-body">${r.finding_summary}</div>
-            ${r.recommended_action ? `<div style="font-size:12px;color:var(--gray-700);margin-bottom:10px;padding:10px;background:var(--gray-50);border-radius:4px;">
+            ${r.recommended_action ? `<div style="font-size:12px;color:var(--gray-800);margin-bottom:10px;padding:10px 12px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:4px;">
                 <strong>Recommended Action:</strong> ${r.recommended_action}
             </div>` : ''}
             <div class="rec-card-meta">
-                <span><i class="fas fa-tag"></i> ${r.area}</span>
-                ${r.suggested_owner ? `<span><i class="fas fa-user"></i> ${r.suggested_owner}</span>` : ''}
-                <span><i class="fas fa-clock"></i> ${r.status}</span>
+                <span>${icon('tag', 13)} ${r.area.replace('_', ' ')}</span>
+                ${r.suggested_owner ? `<span>${icon('user', 13)} ${r.suggested_owner}</span>` : ''}
+                <span>${icon('clock', 13)} ${r.status}</span>
                 <span>
                     <button class="rec-action-btn" onclick="updateRecStatus(${r.id}, 'reviewed')">Mark Reviewed</button>
                     <button class="rec-action-btn" onclick="updateRecStatus(${r.id}, 'approved')">Approve</button>
@@ -1742,11 +2039,13 @@
         const models = status.models || [];
 
         let html = `
-            <div style="background:var(--green-light);border:1px solid #6EE7B7;border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;font-size:13px;color:#065F46;">
-                <i class="fas fa-check-circle"></i>
-                Best model: <strong>${status.best_model || 'None'}</strong> |
-                Training data: ${status.training_data || 'N/A'} |
-                Last trained: ${status.last_trained ? new Date(status.last_trained).toLocaleString() : 'Never'}
+            <div style="background:var(--green-light);border:1px solid var(--green-border);border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--green-text);display:flex;align-items:center;gap:8px;">
+                ${icon('check', 16)}
+                <div>
+                    Best active model: <strong>${status.best_model || 'None'}</strong> |
+                    Training data: ${status.training_data || 'N/A'} |
+                    Last trained: ${status.last_trained ? new Date(status.last_trained).toLocaleString() : 'Never'}
+                </div>
             </div>
         `;
 
@@ -1756,7 +2055,7 @@
 
             html += `<div class="model-card" style="${isBest ? 'border-color:var(--pink);border-width:2px;' : ''}">
                 <h4>
-                    ${isBest ? '<i class="fas fa-crown" style="color:var(--pink);"></i>' : '<i class="fas fa-flask" style="color:var(--gray-400);"></i>'}
+                    <span style="color:${isBest ? 'var(--pink)' : 'var(--gray-400)'};">${isBest ? icon('zap', 16) : icon('box', 16)}</span>
                     ${m.model_name}
                     <span class="badge badge-${m.status === 'active' ? 'active' : m.status === 'below_acceptance' ? 'high' : 'medium'}">${m.status}</span>
                 </h4>
@@ -1768,13 +2067,16 @@
                     <div class="metric-mini"><div class="label">ROC-AUC</div><div class="value">${met.roc_auc ? (met.roc_auc * 100).toFixed(1) + '%' : 'N/A'}</div></div>
                 </div>
                 ${m.feature_importances ? `<div style="margin-top:16px;">
-                    <h4 style="font-size:12px;margin-bottom:10px;color:var(--gray-600);">Feature Importance</h4>
+                    <h4 style="font-size:12px;margin-bottom:10px;color:var(--gray-600);font-weight:600;">Feature Importance</h4>
                     ${renderFeatureBars(m.feature_importances)}
                 </div>` : ''}
-                <div style="margin-top:12px;font-size:12px;color:var(--gray-500);">
-                    Train: ${m.training_samples || 'N/A'} samples | Test: ${m.test_samples || 'N/A'} samples |
-                    Acceptance: F1 ≥ ${(m.acceptance_threshold_f1 * 100).toFixed(0)}% |
-                    ${m.meets_acceptance_criteria ? '✓ Meets criteria' : '✗ Below criteria'}
+                <div style="margin-top:12px;font-size:12px;color:var(--gray-500);display:flex;align-items:center;gap:12px;">
+                    <span>Train: ${m.training_samples || 'N/A'} samples</span>
+                    <span>Test: ${m.test_samples || 'N/A'} samples</span>
+                    <span>Acceptance: F1 ≥ ${(m.acceptance_threshold_f1 * 100).toFixed(0)}%</span>
+                    <span class="badge ${m.meets_acceptance_criteria ? 'badge-low' : 'badge-high'}">
+                        ${m.meets_acceptance_criteria ? 'Meets Criteria' : 'Below Criteria'}
+                    </span>
                 </div>
             </div>`;
         });
@@ -1827,15 +2129,18 @@
         const container = document.getElementById('data-quality-container');
         const reports = dq.reports || [];
 
-        let html = `<div style="background:var(--blue-light);border:1px solid #93C5FD;border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;font-size:13px;color:#1E40AF;">
-            <i class="fas fa-info-circle"></i>
-            Using synthetic demo data for development and testing. No real student data involved.
+        let html = `<div style="background:var(--blue-light);border:1px solid var(--blue-border);border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--blue-text);display:flex;align-items:center;gap:8px;">
+            ${icon('info', 16)}
+            <div>Using synthetic demo data for development and testing. No real student data involved.</div>
         </div>`;
 
         html += reports.map(r => `
             <div class="panel" style="margin-bottom:16px;">
                 <div class="panel-header">
-                    <h3><i class="fas fa-table" style="color:var(--gray-400);margin-right:8px;"></i>${r.data_source}</h3>
+                    <h3>
+                        <span style="color:var(--gray-400);margin-right:6px;">${icon('table', 16)}</span>
+                        ${r.data_source}
+                    </h3>
                     <span class="badge ${r.quality_score >= 0.95 ? 'badge-low' : r.quality_score >= 0.8 ? 'badge-medium' : 'badge-high'}">
                         Quality: ${(r.quality_score * 100).toFixed(1)}%
                     </span>
@@ -1858,7 +2163,6 @@
 
     // ─── Refresh ─────────────────────────────────────────────────────────
     async function refreshData() {
-        // Destroy existing charts
         Object.values(charts).forEach(c => c.destroy());
         charts = {};
 
@@ -1871,26 +2175,5 @@
     // ─── Init ────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', loadAllData);
     </script>
-
-    <!-- Teacher Improvement Plan Modal -->
-    <div id="teacher-modal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeTeacherModal()">
-        <div class="modal-box">
-            <div class="modal-header">
-                <div style="display:flex;align-items:center;gap:12px;">
-                    <div style="width:42px;height:42px;border-radius:50%;background:rgba(212,20,110,0.1);color:var(--pink);display:flex;align-items:center;justify-content:center;font-size:18px;">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                    </div>
-                    <div>
-                        <h3 id="modal-teacher-name" style="margin:0;font-size:17px;font-weight:700;color:var(--dark);">Teacher Name</h3>
-                        <p id="modal-teacher-subtitle" style="margin:2px 0 0;font-size:12px;color:var(--gray-500);">ID • Specialization • Experience</p>
-                    </div>
-                </div>
-                <button class="btn-close" onclick="closeTeacherModal()">&times;</button>
-            </div>
-            <div class="modal-body" id="modal-teacher-body">
-                <!-- Content dynamically injected -->
-            </div>
-        </div>
-    </div>
 </body>
 </html>
