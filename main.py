@@ -33,17 +33,33 @@ def main():
 
     if args.train:
         from app.demo_data import generate_all_demo_data
-        from app.ml_pipeline import run_full_training_pipeline
+        from app.ml_pipeline import run_full_training_pipeline, run_teacher_training_pipeline
         import json
 
         data = generate_all_demo_data()
         results = run_full_training_pipeline(data["students"], data["attendance"], data["grades"])
 
         print("\n" + "=" * 60)
-        print("TRAINING RESULTS")
+        print("STUDENT SUCCESS ML TRAINING RESULTS")
         print("=" * 60)
         print(f"Best model: {results['best_model']}")
         for name, eval_data in results["evaluations"].items():
+            print(f"\n{name}:")
+            print(f"  F1:        {eval_data['f1']:.4f}")
+            print(f"  Precision: {eval_data['precision']:.4f}")
+            print(f"  Recall:    {eval_data['recall']:.4f}")
+            print(f"  ROC-AUC:   {eval_data.get('roc_auc', 'N/A')}")
+            print(f"  Accuracy:  {eval_data['accuracy']:.4f}")
+        print("=" * 60)
+
+        print("\n" + "=" * 60)
+        print("TEACHER SUPPORT & INSTRUCTIONAL IMPROVEMENT ML RESULTS")
+        print("=" * 60)
+        t_results = run_teacher_training_pipeline(
+            data["teachers"], data["classes"], data["grades"], data["attendance"]
+        )
+        print(f"Best model: {t_results['best_model']}")
+        for name, eval_data in t_results["evaluations"].items():
             print(f"\n{name}:")
             print(f"  F1:        {eval_data['f1']:.4f}")
             print(f"  Precision: {eval_data['precision']:.4f}")

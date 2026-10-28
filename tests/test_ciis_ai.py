@@ -45,7 +45,10 @@ from app.demo_data import (
 from app.ml_pipeline import (
     StudentFeatureEngineer, define_risk_labels,
     StudentRiskModelTrainer, run_full_training_pipeline,
-    StudentRiskPredictor
+    StudentRiskPredictor,
+    TeacherFeatureEngineer, define_teacher_support_labels,
+    TeacherSupportModelTrainer, TeacherSupportPredictor,
+    run_teacher_training_pipeline
 )
 from app.analytics import ClassAnalytics, TeacherAnalytics, SchoolForecaster
 from app.recommendations import RecommendationEngine
@@ -61,10 +64,20 @@ def demo_data():
 
 @pytest.fixture(scope="session")
 def trained_models(demo_data):
-    """Train models once for all tests."""
+    """Train student models once for all tests."""
     os.makedirs("./test_models", exist_ok=True)
     results = run_full_training_pipeline(
         demo_data["students"], demo_data["attendance"], demo_data["grades"], seed=42
+    )
+    return results
+
+
+@pytest.fixture(scope="session")
+def trained_teacher_models(demo_data):
+    """Train teacher support models once for all tests."""
+    os.makedirs("./test_models", exist_ok=True)
+    results = run_teacher_training_pipeline(
+        demo_data["teachers"], demo_data["classes"], demo_data["grades"], demo_data["attendance"], seed=42
     )
     return results
 
@@ -890,3 +903,137 @@ class TestSecurity:
         if gitignore.exists():
             content = gitignore.read_text()
             assert ".env" in content
+
+
+# ─── Teacher Support ML Tests ─────────────────────────────────────────────────
+
+class TestTeacherMLPipeline:
+    """Tests for Machine Learning Teacher Support & Instructional Improvement."""
+
+    def test_teacher_features_built(self, demo_data):
+        engineer = TeacherFeatureEngineer()
+        features = engineer.build_features(
+            demo_data["teachers"], demo_data["classes"], demo_data["grades"], demo_data["attendance"]
+        )
+        assert not features.empty
+        assert "teacher_id" in features.columns
+        for fn in TeacherFeatureEngineer.FEATURE_NAMES:
+            assert fn in features.columns, f"Missing feature: {fn}"
+        assert (features["years_experience"] >= 0).all()
+        assert (features["sections_count"] >= 0).all()
+
+    def test_teacher_support_labels(self, demo_data):
+        engineer = TeacherFeatureEngineer()
+        features = engineer.build_features(
+            demo_data["teachers"], demo_data["classes"], demo_data["grades"], demo_data["attendance"]
+        )
+        labels = define_teacher_support_labels(features)
+        assert len(labels) == len(features)
+        assert set(labels.unique()).issubset({0, 1})
+
+    def test_teacher_training_produces_artifacts(self, demo_data, trained_teacher_models):
+        assert "best_model" in trained_teacher_models
+        assert trained_teacher_models["best_model"] in ["random_forest", "logistic_regression"]
+
+        evals = trained_teacher_models["evaluations"]
+        assert "logistic_regression" in evals
+        assert "random_forest" in evals
+
+        for model_name, ev in evals.items():
+            assert 0.0 <= ev["accuracy"] <= 1.0
+            assert 0.0 <= ev["f1"] <= 1.0
+            assert ev["training_samples"] > 0
+            assert ev["test_samples"] > 0
+
+    def test_teacher_predictions_schema(self, demo_data, trained_teacher_models):
+        best = trained_teacher_models["best_model"]
+        model_path = f"./test_models/teacher_support_{best}_v1.0.joblib"
+        metadata_path = f"./test_models/teacher_support_{best}_v1.0_metadata.json"
+
+        predictor = TeacherSupportPredictor(model_path, metadata_path)
+        engineer = TeacherFeatureEngineer()
+        features = engineer.build_features(
+            demo_data["teachers"], demo_data["classes"], demo_data["grades"], demo_data["attendance"]
+        )
+        preds = predictor.predict(features)
+
+        assert len(preds) == len(features)
+        required_keys = [
+            "teacher_id", "full_name", "specialization", "years_experience",
+            "support_priority", "support_category", "support_probability",
+            "contributing_factors", "improvement_plan", "ethical_disclaimer"
+        ]
+        for p in preds:
+            for k in required_keys:
+                assert k in p, f"Missing key '{k}' in teacher prediction"
+            assert p["support_priority"] in ["high", "medium", "low"]
+            assert 0.0 <= p["support_probability"] <= 1.0
+
+    def test_teacher_improvement_plan_details(self, demo_data, trained_teacher_models):
+        best = trained_teacher_models["best_model"]
+        model_path = f"./test_models/teacher_support_{best}_v1.0.joblib"
+        metadata_path = f"./test_models/teacher_support_{best}_v1.0_metadata.json"
+
+        predictor = TeacherSupportPredictor(model_path, metadata_path)
+        engineer = TeacherFeatureEngineer()
+        features = engineer.build_features(
+            demo_data["teachers"], demo_data["classes"], demo_data["grades"], demo_data["attendance"]
+        )
+        preds = predictor.predict(features)
+
+        for p in preds:
+            plan = p["improvement_plan"]
+            assert "primary_focus_area" in plan and len(plan["primary_focus_area"]) > 0
+            assert "specific_actions" in plan and len(plan["specific_actions"]) >= 2
+            assert "recommended_pd_workshop" in plan and len(plan["recommended_pd_workshop"]) > 0
+            assert "target_measurable_outcome" in plan and len(plan["target_measurable_outcome"]) > 0
+
+    def test_teacher_supportive_language_and_no_ranking(self, demo_data, trained_teacher_models):
+        best = trained_teacher_models["best_model"]
+        model_path = f"./test_models/teacher_support_{best}_v1.0.joblib"
+        metadata_path = f"./test_models/teacher_support_{best}_v1.0_metadata.json"
+
+        predictor = TeacherSupportPredictor(model_path, metadata_path)
+        engineer = TeacherFeatureEngineer()
+        features = engineer.build_features(
+            demo_data["teachers"], demo_data["classes"], demo_data["grades"], demo_data["attendance"]
+        )
+        preds = predictor.predict(features)
+
+        harmful_terms = ["bad teacher", "incompetent", "fire", "punish", "rank #", "worst"]
+        for p in preds:
+            p_str = json.dumps(p).lower()
+            for term in harmful_terms:
+                assert term not in p_str, f"Found derogatory term '{term}' in teacher prediction"
+            assert "not an evaluation of personal competence" in p["ethical_disclaimer"].lower()
+
+    def test_teacher_ml_api_endpoints(self):
+        from app.api import app
+        with TestClient(app) as client:
+            # 1. Predictions list
+            r_preds = client.get("/api/v1/teachers/ml/predictions")
+            assert r_preds.status_code == 200
+            teachers = r_preds.json()
+            assert isinstance(teachers, list)
+            assert len(teachers) > 0
+
+            # 2. Priority filter
+            r_filtered = client.get("/api/v1/teachers/ml/predictions?priority=high")
+            assert r_filtered.status_code == 200
+            for t in r_filtered.json():
+                assert t["support_priority"] == "high"
+
+            # 3. Single teacher detail
+            tid = teachers[0]["teacher_id"]
+            r_single = client.get(f"/api/v1/teachers/ml/predictions/{tid}")
+            assert r_single.status_code == 200
+            assert r_single.json()["teacher_id"] == tid
+
+            # 4. Improvement areas summary
+            r_areas = client.get("/api/v1/teachers/ml/improvement-areas")
+            assert r_areas.status_code == 200
+            areas_data = r_areas.json()
+            assert "total_analyzed" in areas_data
+            assert "primary_focus_areas" in areas_data
+            assert "recommended_workshops" in areas_data
+            assert len(areas_data["recommended_workshops"]) > 0

@@ -38,6 +38,7 @@ class RecommendationEngine:
         class_analytics: Optional[dict] = None,
         attendance_data: Optional[dict] = None,
         operational_metrics: Optional[dict] = None,
+        teacher_predictions: Optional[list[dict]] = None,
     ) -> list[dict]:
         """
         Generate recommendations from all available data sources.
@@ -47,6 +48,7 @@ class RecommendationEngine:
             class_analytics: Class/subject analysis results
             attendance_data: Attendance trend data
             operational_metrics: School operational metrics
+            teacher_predictions: Teacher ML instructional support predictions
 
         Returns:
             Prioritized list of recommendations
@@ -65,6 +67,9 @@ class RecommendationEngine:
 
         if operational_metrics:
             self._operational_recommendations(operational_metrics)
+
+        if teacher_predictions:
+            self._teacher_support_recommendations(teacher_predictions)
 
         # Sort by priority
         priority_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
@@ -316,4 +321,126 @@ class RecommendationEngine:
                 ),
                 "suggested_owner": "School Administration",
                 "source_type": "analytics",
+            })
+
+    # ─── Teacher Support ML Recommendations ───────────────────────────
+
+    def _teacher_support_recommendations(self, teacher_predictions: list[dict]):
+        """Generate institutional support & improvement recommendations from teacher ML diagnostics."""
+        high_support = [t for t in teacher_predictions if t.get("support_priority") == "high"]
+        multi_prep = [t for t in teacher_predictions if t.get("distinct_subjects_count", 0) >= 3]
+        wide_variance = [t for t in teacher_predictions if t.get("grade_std_dev", 0) >= 14.0]
+        early_career = [t for t in teacher_predictions if t.get("years_experience", 0) <= 3]
+        mentor_candidates = [t for t in teacher_predictions if t.get("years_experience", 0) >= 8 and t.get("support_priority") == "low"]
+
+        # 1. School-wide Multi-Prep Relief
+        if multi_prep:
+            self._add_recommendation({
+                "title": f"Workload Rebalancing: Provide co-planning support for {len(multi_prep)} multi-prep teachers",
+                "area": "teacher_support",
+                "priority": "high",
+                "finding_summary": (
+                    f"{len(multi_prep)} faculty members are currently assigned 3 or more distinct subjects "
+                    f"to prepare each week. Machine learning diagnostics identify multi-prep load as a primary driver "
+                    f"of instructional pacing strain."
+                ),
+                "supporting_metrics": {
+                    "multi_prep_teacher_count": len(multi_prep),
+                    "teachers_affected": [t.get("full_name") for t in multi_prep[:5]],
+                },
+                "reason": (
+                    "Preparing 3+ distinct curricula concurrently fragments instructional time. "
+                    "Targeted co-planning and digital lesson repositories mitigate burnout and ensure curriculum depth."
+                ),
+                "recommended_action": (
+                    "Review next term's scheduling to cap preps at 2 where possible. In the interim, provide "
+                    "shared departmental lesson plan templates and allocate 1 hour weekly of collaborative planning time."
+                ),
+                "suggested_owner": "Academic Dean / Department Chairs",
+                "suggested_review_date": (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=14)).isoformat(),
+                "expected_outcome": "30% reduction in lesson preparation overhead and improved pacing alignment",
+                "source_type": "ml_prediction",
+            })
+
+        # 2. Differentiated Learning Support
+        if wide_variance:
+            self._add_recommendation({
+                "title": f"Instructional Support: Differentiated learning workshop for {len(wide_variance)} faculty sections",
+                "area": "teacher_support",
+                "priority": "medium",
+                "finding_summary": (
+                    f"{len(wide_variance)} teachers have classroom score standard deviations exceeding ±14.0 points, "
+                    f"indicating substantial diversity in baseline student ability across sections."
+                ),
+                "supporting_metrics": {
+                    "wide_variance_teacher_count": len(wide_variance),
+                    "avg_std_dev": round(float(np.mean([t.get("grade_std_dev", 0) for t in wide_variance])), 2),
+                },
+                "reason": (
+                    "Mixed-ability classrooms require tiered learning activities and formative checks "
+                    "to prevent struggling students from falling behind while keeping advanced learners engaged."
+                ),
+                "recommended_action": (
+                    "Host an instructional workshop on 'Tiered Formative Assessment and Leveled Reading Tasks'. "
+                    "Supply department rubric templates for scaffolding complex assignments."
+                ),
+                "suggested_owner": "Instructional Specialist / Academic Affairs",
+                "suggested_review_date": (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=21)).isoformat(),
+                "expected_outcome": "Narrow classroom score variance by 20% and elevate section pass rates",
+                "source_type": "ml_prediction",
+            })
+
+        # 3. Faculty Mentorship Pairing Program
+        if early_career and mentor_candidates:
+            self._add_recommendation({
+                "title": f"Pair {len(early_career)} early-career teachers with senior instructional mentors",
+                "area": "teacher_support",
+                "priority": "high",
+                "finding_summary": (
+                    f"Identified {len(early_career)} faculty members in their first 3 years of teaching alongside "
+                    f"{len(mentor_candidates)} senior faculty with high classroom consistency. Structured peer coaching "
+                    f"accelerates instructional mastery."
+                ),
+                "supporting_metrics": {
+                    "early_career_count": len(early_career),
+                    "mentor_candidates_count": len(mentor_candidates),
+                },
+                "reason": (
+                    "Mentorship provides formative support on classroom management, curriculum pacing, "
+                    "and parent communication without evaluative pressure."
+                ),
+                "recommended_action": (
+                    "Pair each early-career teacher with a senior mentor in their subject cluster. "
+                    "Establish monthly non-evaluative peer observations and lesson review sessions."
+                ),
+                "suggested_owner": "Faculty Development Committee / Principal",
+                "suggested_review_date": (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=14)).isoformat(),
+                "expected_outcome": "100% mentor pairing completion and positive early-career retention",
+                "source_type": "ml_prediction",
+            })
+
+        # 4. Individual priority support items (top 3 highest priority)
+        for t in high_support[:3]:
+            plan = t.get("improvement_plan", {})
+            self._add_recommendation({
+                "title": f"Instructional Action Plan: {t.get('full_name')} ({t.get('specialization')}) — {plan.get('primary_focus_area', 'Instructional Support')}",
+                "area": "teacher_support",
+                "priority": "high",
+                "finding_summary": (
+                    f"Machine learning support diagnostic flags high support priority for {t.get('full_name')}. "
+                    f"Workload: {t.get('sections_count')} sections ({t.get('distinct_subjects_count')} preps), "
+                    f"Class pass rate: {t.get('class_pass_rate')}%, Grade spread: ±{t.get('grade_std_dev')}."
+                ),
+                "supporting_metrics": {
+                    "teacher_id": t.get("teacher_id"),
+                    "support_probability": t.get("support_probability"),
+                    "primary_focus": plan.get("primary_focus_area"),
+                    "factors": [f["factor"] for f in t.get("contributing_factors", [])],
+                },
+                "reason": f"Targeted support in {plan.get('primary_focus_area')} will optimize classroom outcomes.",
+                "recommended_action": " ".join(plan.get("specific_actions", ["Review curriculum pacing with department head."])),
+                "suggested_owner": "Department Head",
+                "suggested_review_date": (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=28)).isoformat(),
+                "expected_outcome": plan.get("target_measurable_outcome", "Improve instructional consistency and student achievement"),
+                "source_type": "ml_prediction",
             })

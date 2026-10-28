@@ -35,7 +35,9 @@ from app.database import PredictionRun, DataQualityReport, AuditLog, Recommendat
 from app.demo_data import generate_all_demo_data, get_data_summary
 from app.ml_pipeline import (
     run_full_training_pipeline, StudentRiskPredictor,
-    StudentFeatureEngineer, define_risk_labels
+    StudentFeatureEngineer, define_risk_labels,
+    run_teacher_training_pipeline, TeacherSupportPredictor,
+    TeacherFeatureEngineer, define_teacher_support_labels
 )
 from app.analytics import ClassAnalytics, TeacherAnalytics, SchoolForecaster
 from app.recommendations import RecommendationEngine
@@ -55,7 +57,9 @@ class AppState:
     """Application state holder — not a substitute for database."""
     data: dict = {}
     training_results: dict = {}
+    teacher_training_results: dict = {}
     predictions: list = []
+    teacher_predictions: list = []
     analytics_cache: dict = {}
     recommendations: list = []
     data_summary: dict = {}
@@ -108,8 +112,15 @@ def _initialize_demo_system():
     app_state.training_results = results
     app_state.model_status = "trained"
 
+    logger.info("Running Teacher Support ML training pipeline...")
+    teacher_results = run_teacher_training_pipeline(
+        data["teachers"], data["classes"], data["grades"], data["attendance"]
+    )
+    app_state.teacher_training_results = teacher_results
+
     logger.info("Running predictions...")
     _run_predictions()
+    _run_teacher_predictions()
 
     logger.info("Running analytics...")
     _run_analytics()
@@ -147,6 +158,32 @@ def _run_predictions():
     predictions = predictor.predict(features)
     app_state.predictions = predictions
     logger.info(f"Generated {len(predictions)} predictions")
+
+
+def _run_teacher_predictions():
+    """Run teacher instructional support predictions using best trained model."""
+    settings = get_settings()
+    best_model = app_state.teacher_training_results.get("best_model", "random_forest")
+
+    model_path = Path(settings.model_dir) / f"teacher_support_{best_model}_v1.0.joblib"
+    metadata_path = Path(settings.model_dir) / f"teacher_support_{best_model}_v1.0_metadata.json"
+
+    if not model_path.exists():
+        logger.warning(f"Teacher model file not found: {model_path}")
+        return
+
+    predictor = TeacherSupportPredictor(str(model_path), str(metadata_path))
+    engineer = TeacherFeatureEngineer()
+    features = engineer.build_features(
+        app_state.data["teachers"],
+        app_state.data["classes"],
+        app_state.data["grades"],
+        app_state.data["attendance"],
+    )
+
+    teacher_predictions = predictor.predict(features)
+    app_state.teacher_predictions = teacher_predictions
+    logger.info(f"Generated {len(teacher_predictions)} teacher support predictions")
 
 
 def _run_analytics():
@@ -192,6 +229,7 @@ def _generate_recommendations():
             "by_grade": app_state.analytics_cache.get("attendance_by_grade", []),
         },
         operational_metrics=app_state.analytics_cache.get("operational_metrics", {}),
+        teacher_predictions=app_state.teacher_predictions,
     )
     app_state.recommendations = recommendations
 
@@ -468,6 +506,77 @@ async def collaboration_opportunities():
     }
 
 
+@app.get("/api/v1/teachers/ml/predictions")
+async def teacher_ml_predictions(
+    priority: Optional[str] = Query(None, description="Filter by support priority: high, medium, low"),
+    specialization: Optional[str] = Query(None, description="Filter by specialization"),
+):
+    """
+    Teacher support diagnostics and instructional improvement plans powered by Machine Learning.
+    Provides targeted action plans for workload management, differentiated learning, and mentorship.
+    """
+    if not app_state.teacher_predictions:
+        if not app_state.is_ready:
+            raise HTTPException(status_code=503, detail="System initializing. Please try again shortly.")
+        return []
+
+    preds = app_state.teacher_predictions
+    if priority:
+        preds = [p for p in preds if p.get("support_priority") == priority.lower()]
+    if specialization:
+        preds = [p for p in preds if p.get("specialization", "").lower() == specialization.lower()]
+
+    return preds
+
+
+@app.get("/api/v1/teachers/ml/predictions/{teacher_id}")
+async def teacher_ml_prediction_detail(teacher_id: str):
+    """Get single teacher support diagnostic and specific improvement plan."""
+    for p in app_state.teacher_predictions:
+        if p.get("teacher_id") == teacher_id:
+            return p
+    raise HTTPException(status_code=404, detail=f"Teacher prediction not found for ID: {teacher_id}")
+
+
+@app.get("/api/v1/teachers/ml/improvement-areas")
+async def teacher_improvement_areas():
+    """School-wide aggregate summary of faculty improvement focus areas and recommended PD."""
+    preds = app_state.teacher_predictions
+    if not preds:
+        return {"total_analyzed": 0, "focus_areas": {}, "recommended_workshops": []}
+
+    focus_counts = {}
+    workshops = []
+    seen_workshops = set()
+    priority_counts = {"high": 0, "medium": 0, "low": 0}
+
+    for p in preds:
+        pri = p.get("support_priority", "low")
+        priority_counts[pri] = priority_counts.get(pri, 0) + 1
+
+        plan = p.get("improvement_plan", {})
+        fa = plan.get("primary_focus_area", "General Professional Growth")
+        focus_counts[fa] = focus_counts.get(fa, 0) + 1
+
+        ws = plan.get("recommended_pd_workshop")
+        if ws and ws not in seen_workshops:
+            seen_workshops.add(ws)
+            workshops.append({
+                "workshop_title": ws,
+                "focus_area": fa,
+                "target_faculty_count": sum(1 for x in preds if x.get("improvement_plan", {}).get("recommended_pd_workshop") == ws),
+            })
+
+    return {
+        "total_analyzed": len(preds),
+        "priority_distribution": priority_counts,
+        "primary_focus_areas": focus_counts,
+        "recommended_workshops": sorted(workshops, key=lambda x: -x["target_faculty_count"]),
+        "ethical_disclaimer": "All analytics are used for professional development allocation, not performance evaluation.",
+        "as_of": app_state.last_refresh,
+    }
+
+
 # ─── School Forecasting ──────────────────────────────────────────────────────
 
 @app.get("/api/v1/school/enrollment")
@@ -647,6 +756,11 @@ async def dashboard_overview():
             level = p.get("risk_level", "unknown")
             pred_summary[level] = pred_summary.get(level, 0) + 1
 
+    teacher_summary = {"total": len(app_state.teacher_predictions), "high": 0, "medium": 0, "low": 0}
+    for t in app_state.teacher_predictions:
+        pri = t.get("support_priority", "low")
+        teacher_summary[pri] = teacher_summary.get(pri, 0) + 1
+
     rec_summary = {}
     for r in app_state.recommendations:
         priority = r.get("priority", "unknown")
@@ -660,6 +774,7 @@ async def dashboard_overview():
             "pass_rate": metrics.get("overall_pass_rate"),
         },
         "student_risk_summary": pred_summary,
+        "teacher_support_summary": teacher_summary,
         "recommendations_summary": {
             "total": len(app_state.recommendations),
             "by_priority": rec_summary,
@@ -670,6 +785,10 @@ async def dashboard_overview():
             "best_model": app_state.training_results.get("best_model"),
             "f1_score": app_state.training_results.get("evaluations", {}).get(
                 app_state.training_results.get("best_model", ""), {}
+            ).get("f1"),
+            "teacher_best_model": app_state.teacher_training_results.get("best_model"),
+            "teacher_f1_score": app_state.teacher_training_results.get("evaluations", {}).get(
+                app_state.teacher_training_results.get("best_model", ""), {}
             ).get("f1"),
         },
         "last_refresh": app_state.last_refresh,

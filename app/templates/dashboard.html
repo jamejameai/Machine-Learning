@@ -580,6 +580,57 @@
             color: var(--gray-700);
             margin-left: 8px;
         }
+
+        /* ─── Modal ─────────────────────────────────────────── */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(23, 23, 23, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-box {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 680px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--gray-200);
+            display: flex;
+            flex-direction: column;
+            animation: modalFadeIn 0.2s ease-out;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gray-400);
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+            border-radius: var(--radius);
+        }
+        .btn-close:hover { color: var(--dark); background: var(--gray-100); }
     </style>
 </head>
 <body>
@@ -746,17 +797,62 @@
 
             <!-- ─── Teacher Support ─────────────────────────── -->
             <section class="page-section" id="page-teachers">
-                <div style="background:var(--blue-light);border:1px solid #93C5FD;border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;font-size:13px;color:#1E40AF;">
-                    <i class="fas fa-info-circle"></i>
-                    This section provides aggregate insights to support teachers. It is not a ranking system. Many factors affect class outcomes beyond teacher control.
+                <div style="background:var(--blue-light);border:1px solid #93C5FD;border-radius:var(--radius);padding:14px 18px;margin-bottom:24px;font-size:13px;color:#1E40AF;display:flex;align-items:flex-start;gap:12px;">
+                    <i class="fas fa-info-circle" style="font-size:16px;margin-top:2px;flex-shrink:0;"></i>
+                    <div>
+                        <strong>Ethical Teacher Support & Instructional Guidance:</strong>
+                        This module uses Machine Learning to analyze faculty workload, multi-prep demands, class score diversity, and instructional trends.
+                        Its purpose is to allocate institutional support, co-planning time, and targeted professional development. It is <strong>never</strong> used as an automated evaluation or ranking system.
+                    </div>
                 </div>
+
+                <!-- Teacher ML Summary KPIs -->
+                <div class="metric-grid" id="teacher-ml-summary-cards" style="margin-bottom:24px;"></div>
+
+                <!-- Focus Areas & PD Workshops -->
+                <div class="panel-grid" style="margin-bottom:24px;">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3><i class="fas fa-bullseye" style="color:var(--pink);margin-right:8px;"></i>Faculty Improvement Focus Areas (ML)</h3>
+                        </div>
+                        <div class="panel-body" id="teacher-focus-areas-container"></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3><i class="fas fa-graduation-cap" style="color:var(--blue);margin-right:8px;"></i>Recommended Professional Development</h3>
+                        </div>
+                        <div class="panel-body" id="teacher-workshops-container"></div>
+                    </div>
+                </div>
+
+                <!-- Faculty Diagnostics & Improvement Table -->
+                <div class="panel" style="margin-bottom:24px;">
+                    <div class="panel-header" style="flex-wrap:wrap;gap:12px;">
+                        <div>
+                            <h3 style="margin:0;"><i class="fas fa-chalkboard-teacher" style="color:var(--pink);margin-right:8px;"></i>Faculty Support Diagnostics & Action Plans</h3>
+                            <p style="font-size:12px;color:var(--gray-500);margin:3px 0 0;">Machine learning evaluation of classroom diversity, multi-prep load, and personalized improvement guidance.</p>
+                        </div>
+                        <div style="display:flex;gap:10px;align-items:center;">
+                            <input type="text" id="teacher-search" placeholder="Search teacher or subject..." class="form-control" style="font-size:12px;padding:6px 12px;border:1px solid var(--gray-300);border-radius:var(--radius);width:200px;" onkeyup="filterTeachersTable()">
+                            <select id="teacher-priority-filter" class="form-control" style="font-size:12px;padding:6px 10px;border:1px solid var(--gray-300);border-radius:var(--radius);" onchange="filterTeachersTable()">
+                                <option value="">All Priorities</option>
+                                <option value="high">Targeted Support</option>
+                                <option value="medium">Review & Co-Planning</option>
+                                <option value="low">Peer Mentor Candidates</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="teacher-diagnostics-container"></div>
+                </div>
+
+                <!-- Existing Workload & Collaboration Panels -->
                 <div class="panel-grid">
                     <div class="panel">
-                        <div class="panel-header"><h3>Teacher Workload Distribution</h3></div>
+                        <div class="panel-header"><h3><i class="fas fa-tasks" style="color:var(--gray-600);margin-right:8px;"></i>Workload & Capacity Overview</h3></div>
                         <div class="panel-body" id="teacher-workload-container"></div>
                     </div>
                     <div class="panel">
-                        <div class="panel-header"><h3>Collaboration Opportunities</h3></div>
+                        <div class="panel-header"><h3><i class="fas fa-users" style="color:var(--green);margin-right:8px;"></i>Subject Collaboration Opportunities</h3></div>
                         <div class="panel-body" id="collaboration-container"></div>
                     </div>
                 </div>
@@ -874,7 +970,8 @@
     async function loadAllData() {
         const [overview, predictions, subjects, gradePerf, attendance,
                struggling, workload, collaboration, enrollment, forecast,
-               progress, modelStatus, dataQuality, recommendations] = await Promise.all([
+               progress, modelStatus, dataQuality, recommendations,
+               teacherPredictions, teacherImprovementAreas] = await Promise.all([
             fetchJSON('/api/v1/dashboard/overview'),
             fetchJSON('/api/v1/students/predictions?limit=500'),
             fetchJSON('/api/v1/classes/analytics/subjects'),
@@ -889,11 +986,13 @@
             fetchJSON('/api/v1/models/status'),
             fetchJSON('/api/v1/data/quality'),
             fetchJSON('/api/v1/recommendations'),
+            fetchJSON('/api/v1/teachers/ml/predictions'),
+            fetchJSON('/api/v1/teachers/ml/improvement-areas'),
         ]);
 
         dashboardData = { overview, subjects, gradePerf, attendance, struggling,
                           workload, collaboration, enrollment, forecast, progress,
-                          modelStatus, dataQuality };
+                          modelStatus, dataQuality, teacherPredictions, teacherImprovementAreas };
         allPredictions = predictions?.predictions || [];
         allRecommendations = recommendations?.recommendations || [];
 
@@ -1177,36 +1276,309 @@
 
     // ─── Teachers ────────────────────────────────────────────────────────
     function renderTeachers() {
+        const teacherML = dashboardData.teacherPredictions || [];
+        const improvementData = dashboardData.teacherImprovementAreas || {};
+
+        // 1. KPI Cards
+        const kpiContainer = document.getElementById('teacher-ml-summary-cards');
+        if (kpiContainer) {
+            const highCount = teacherML.filter(t => t.support_priority === 'high').length;
+            const medCount = teacherML.filter(t => t.support_priority === 'medium').length;
+            const lowCount = teacherML.filter(t => t.support_priority === 'low').length;
+
+            kpiContainer.innerHTML = `
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Faculty Analyzed</span>
+                        <div class="metric-icon" style="background:var(--blue-light);color:var(--blue);"><i class="fas fa-users"></i></div>
+                    </div>
+                    <div class="metric-value">${teacherML.length}</div>
+                    <div class="metric-subtext">Active teaching staff</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Targeted Support</span>
+                        <div class="metric-icon" style="background:var(--pink-light);color:var(--pink);"><i class="fas fa-hands-helping"></i></div>
+                    </div>
+                    <div class="metric-value" style="color:var(--pink);">${highCount}</div>
+                    <div class="metric-subtext">Multi-prep or classroom pacing strain</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Co-Planning Review</span>
+                        <div class="metric-icon" style="background:var(--yellow-light);color:var(--yellow);"><i class="fas fa-clipboard-list"></i></div>
+                    </div>
+                    <div class="metric-value">${medCount}</div>
+                    <div class="metric-subtext">Moderate workload / mixed-ability</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Peer Mentor Candidates</span>
+                        <div class="metric-icon" style="background:var(--green-light);color:var(--green);"><i class="fas fa-award"></i></div>
+                    </div>
+                    <div class="metric-value" style="color:var(--green);">${lowCount}</div>
+                    <div class="metric-subtext">Experienced faculty coaches</div>
+                </div>
+            `;
+        }
+
+        // 2. Focus Areas Container
+        const focusContainer = document.getElementById('teacher-focus-areas-container');
+        if (focusContainer) {
+            const focusAreas = improvementData.primary_focus_areas || {};
+            const total = teacherML.length || 1;
+            const entries = Object.entries(focusAreas);
+
+            if (entries.length) {
+                focusContainer.innerHTML = entries.map(([area, count]) => {
+                    const pct = Math.round((count / total) * 100);
+                    return `
+                        <div class="feature-bar" style="margin-bottom:12px;">
+                            <div class="feature-name" style="width:220px;font-weight:600;color:var(--dark);font-size:12px;">${area}</div>
+                            <div class="feature-bar-track" style="height:14px;">
+                                <div class="feature-bar-fill" style="width:${pct}%;background:${pct > 25 ? 'var(--pink)' : 'var(--blue)'};"></div>
+                            </div>
+                            <div class="feature-value" style="width:60px;font-size:12px;">${count} (${pct}%)</div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                focusContainer.innerHTML = '<div class="empty-state"><p>No focus area data available.</p></div>';
+            }
+        }
+
+        // 3. Recommended Workshops Container
+        const workshopsContainer = document.getElementById('teacher-workshops-container');
+        if (workshopsContainer) {
+            const workshops = improvementData.recommended_workshops || [];
+            if (workshops.length) {
+                workshopsContainer.innerHTML = workshops.map(w => `
+                    <div class="rec-card" style="margin-bottom:10px;padding:12px 14px;">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                            <div style="font-weight:700;font-size:13px;color:var(--dark);">
+                                <i class="fas fa-graduation-cap" style="color:var(--blue);margin-right:6px;"></i>${w.workshop_title}
+                            </div>
+                            <span class="badge badge-medium" style="font-size:11px;">${w.target_faculty_count} faculty</span>
+                        </div>
+                        <div style="font-size:12px;color:var(--gray-500);margin-top:4px;">
+                            Pillar: <strong>${w.focus_area}</strong>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                workshopsContainer.innerHTML = '<div class="empty-state"><p>No workshop recommendations generated.</p></div>';
+            }
+        }
+
+        // 4. Diagnostics Table
+        renderTeacherTable(teacherML);
+
+        // 5. Existing Workload & Collaboration
         const workload = dashboardData.workload?.teachers || [];
         const wlContainer = document.getElementById('teacher-workload-container');
-
-        if (workload.length) {
-            wlContainer.innerHTML = `<table class="data-table"><thead><tr>
-                <th>Teacher</th><th>Classes</th><th>Subjects</th><th>Grade Levels</th><th>Workload</th>
-            </tr></thead><tbody>${workload.slice(0, 15).map(t => `<tr>
-                <td><strong>${t.teacher_name}</strong></td>
-                <td>${t.n_classes}</td>
-                <td>${t.n_subjects}</td>
-                <td>${t.grade_levels.map(g => 'G' + g).join(', ')}</td>
-                <td><span class="badge badge-${t.workload_level === 'high' ? 'high' : t.workload_level === 'moderate' ? 'medium' : 'low'}">${t.workload_level}</span></td>
-            </tr>`).join('')}</tbody></table>`;
-        } else {
-            wlContainer.innerHTML = '<div class="empty-state"><p>No workload data available.</p></div>';
+        if (wlContainer) {
+            if (workload.length) {
+                wlContainer.innerHTML = `<table class="data-table"><thead><tr>
+                    <th>Teacher</th><th>Classes</th><th>Subjects</th><th>Grade Levels</th><th>Workload</th>
+                </tr></thead><tbody>${workload.slice(0, 10).map(t => `<tr>
+                    <td><strong>${t.teacher_name}</strong></td>
+                    <td>${t.n_classes}</td>
+                    <td>${t.n_subjects}</td>
+                    <td>${t.grade_levels.map(g => 'G' + g).join(', ')}</td>
+                    <td><span class="badge badge-${t.workload_level === 'high' ? 'high' : t.workload_level === 'moderate' ? 'medium' : 'low'}">${t.workload_level}</span></td>
+                </tr>`).join('')}</tbody></table>`;
+            } else {
+                wlContainer.innerHTML = '<div class="empty-state"><p>No workload data available.</p></div>';
+            }
         }
 
         const collab = dashboardData.collaboration?.opportunities || [];
         const collabContainer = document.getElementById('collaboration-container');
-        if (collab.length) {
-            collabContainer.innerHTML = collab.map(c => `
-                <div class="rec-card">
-                    <div class="rec-card-title"><i class="fas fa-handshake" style="color:var(--blue);margin-right:8px;"></i>${c.subject}</div>
-                    <div class="rec-card-body">${c.n_teachers} teachers: ${c.teacher_names.join(', ')}</div>
-                    <div class="rec-card-meta"><span><i class="fas fa-lightbulb"></i> ${c.suggestion}</span></div>
-                </div>
-            `).join('');
-        } else {
-            collabContainer.innerHTML = '<div class="empty-state"><p>No collaboration data available.</p></div>';
+        if (collabContainer) {
+            if (collab.length) {
+                collabContainer.innerHTML = collab.map(c => `
+                    <div class="rec-card">
+                        <div class="rec-card-title"><i class="fas fa-handshake" style="color:var(--blue);margin-right:8px;"></i>${c.subject}</div>
+                        <div class="rec-card-body">${c.n_teachers} teachers: ${c.teacher_names.join(', ')}</div>
+                        <div class="rec-card-meta"><span><i class="fas fa-lightbulb"></i> ${c.suggestion}</span></div>
+                    </div>
+                `).join('');
+            } else {
+                collabContainer.innerHTML = '<div class="empty-state"><p>No collaboration data available.</p></div>';
+            }
         }
+    }
+
+    function renderTeacherTable(teachersList) {
+        const container = document.getElementById('teacher-diagnostics-container');
+        if (!container) return;
+
+        if (!teachersList.length) {
+            container.innerHTML = '<div class="empty-state"><p>No teacher diagnostics match the selected filters.</p></div>';
+            return;
+        }
+
+        container.innerHTML = `
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Teacher</th>
+                        <th>Specialization</th>
+                        <th>Experience</th>
+                        <th>Workload</th>
+                        <th>Score Variance</th>
+                        <th>Class Pass Rate</th>
+                        <th>Support Priority</th>
+                        <th style="text-align:center;">Action Plan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${teachersList.map(t => {
+                        const pri = t.support_priority;
+                        const badgeClass = pri === 'high' ? 'badge-high' : pri === 'medium' ? 'badge-medium' : 'badge-low';
+                        const priLabel = pri === 'high' ? 'Targeted Support' : pri === 'medium' ? 'Review & Co-Planning' : 'Mentor Candidate';
+                        const multiPrep = t.distinct_subjects_count >= 3;
+                        const earlyCareer = t.years_experience <= 3;
+
+                        return `
+                            <tr>
+                                <td>
+                                    <strong>${t.full_name}</strong>
+                                    <div style="font-size:11px;color:var(--gray-400);">${t.teacher_id}</div>
+                                </td>
+                                <td>
+                                    <span style="font-weight:500;">${t.specialization}</span>
+                                </td>
+                                <td>
+                                    ${t.years_experience} yrs
+                                    ${earlyCareer ? '<span class="badge badge-medium" style="font-size:10px;margin-left:4px;">Early Career</span>' : ''}
+                                </td>
+                                <td>
+                                    ${t.sections_count} sections
+                                    ${multiPrep ? `<span class="badge badge-high" style="font-size:10px;margin-left:4px;">${t.distinct_subjects_count} preps</span>` : `<span style="font-size:11px;color:var(--gray-500);margin-left:4px;">(${t.distinct_subjects_count} prep)</span>`}
+                                </td>
+                                <td>
+                                    ±${t.grade_std_dev.toFixed(1)}
+                                    <span style="font-size:11px;color:${t.grade_trajectory < 0 ? 'var(--pink)' : 'var(--green)'};margin-left:4px;">
+                                        (${t.grade_trajectory >= 0 ? '+' : ''}${t.grade_trajectory.toFixed(1)} traj)
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong>${t.class_pass_rate.toFixed(1)}%</strong>
+                                </td>
+                                <td>
+                                    <span class="badge ${badgeClass}">${priLabel}</span>
+                                </td>
+                                <td style="text-align:center;">
+                                    <button class="btn btn-sm" style="background:var(--pink);color:var(--white);padding:5px 10px;font-size:11px;font-weight:600;border:none;border-radius:var(--radius);cursor:pointer;" onclick="openTeacherPlanModal('${t.teacher_id}')">
+                                        <i class="fas fa-lightbulb" style="margin-right:4px;"></i> View Plan
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    function filterTeachersTable() {
+        const query = (document.getElementById('teacher-search')?.value || '').toLowerCase().trim();
+        const priFilter = (document.getElementById('teacher-priority-filter')?.value || '').toLowerCase();
+        const teacherML = dashboardData.teacherPredictions || [];
+
+        const filtered = teacherML.filter(t => {
+            const matchesQuery = !query ||
+                t.full_name.toLowerCase().includes(query) ||
+                t.teacher_id.toLowerCase().includes(query) ||
+                t.specialization.toLowerCase().includes(query);
+            const matchesPri = !priFilter || t.support_priority === priFilter;
+            return matchesQuery && matchesPri;
+        });
+
+        renderTeacherTable(filtered);
+    }
+
+    function openTeacherPlanModal(teacherId) {
+        const teacherML = dashboardData.teacherPredictions || [];
+        const t = teacherML.find(x => x.teacher_id === teacherId);
+        if (!t) return;
+
+        const modal = document.getElementById('teacher-modal');
+        const plan = t.improvement_plan || {};
+        const factors = t.contributing_factors || [];
+
+        document.getElementById('modal-teacher-name').textContent = t.full_name;
+        document.getElementById('modal-teacher-subtitle').textContent =
+            `${t.teacher_id} • ${t.specialization} • ${t.years_experience} Years Experience • ${t.sections_count} Sections (${t.distinct_subjects_count} Preps)`;
+
+        const pri = t.support_priority;
+        const priBadge = pri === 'high' ? '<span class="badge badge-high">Targeted Instructional Support</span>' :
+                         pri === 'medium' ? '<span class="badge badge-medium">Review & Co-Planning</span>' :
+                         '<span class="badge badge-low">Peer Mentor Candidate</span>';
+
+        const body = document.getElementById('modal-teacher-body');
+        body.innerHTML = `
+            <!-- Priority & Focus Area Banner -->
+            <div style="background:rgba(212,20,110,0.06);border-left:4px solid var(--pink);padding:14px 18px;border-radius:4px;margin-bottom:20px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                    <div style="font-size:11px;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:0.5px;">Primary Improvement Focus Area</div>
+                    ${priBadge}
+                </div>
+                <div style="font-size:16px;font-weight:800;color:var(--dark);margin-bottom:4px;">${plan.primary_focus_area || 'Instructional Support'}</div>
+                <div style="font-size:12px;color:var(--gray-600);">${t.support_category}</div>
+            </div>
+
+            <!-- Contributing Classroom Factors -->
+            <div style="margin-bottom:20px;">
+                <h4 style="font-size:13px;font-weight:700;color:var(--gray-700);margin:0 0 10px;text-transform:uppercase;letter-spacing:0.5px;">
+                    <i class="fas fa-microscope" style="color:var(--blue);margin-right:6px;"></i>ML Diagnostic Factors
+                </h4>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    ${factors.map(f => `
+                        <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius);padding:10px 12px;">
+                            <div style="font-size:11px;color:var(--gray-500);font-weight:600;">${f.factor}</div>
+                            <div style="font-size:13px;font-weight:700;color:var(--dark);margin-top:2px;">${f.value}</div>
+                        </div>
+                    `).join('') || '<div style="font-size:12px;color:var(--gray-500);">Standard classroom workload metrics.</div>'}
+                </div>
+            </div>
+
+            <!-- Concrete Action Steps -->
+            <div style="margin-bottom:20px;">
+                <h4 style="font-size:13px;font-weight:700;color:var(--gray-700);margin:0 0 10px;text-transform:uppercase;letter-spacing:0.5px;">
+                    <i class="fas fa-check-circle" style="color:var(--green);margin-right:6px;"></i>Concrete Actions to Improve
+                </h4>
+                <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.6;color:var(--dark);">
+                    ${(plan.specific_actions || []).map(act => `<li style="margin-bottom:6px;">${act}</li>`).join('')}
+                </ul>
+            </div>
+
+            <!-- Recommended PD Workshop & Target Outcome -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                <div style="background:var(--blue-light);border:1px solid #BFDBFE;border-radius:var(--radius);padding:12px 14px;">
+                    <div style="font-size:11px;font-weight:700;color:#1E40AF;text-transform:uppercase;">Recommended PD Workshop</div>
+                    <div style="font-size:13px;font-weight:700;color:#1E3A8A;margin-top:4px;">${plan.recommended_pd_workshop || 'Continuous Teaching Improvement'}</div>
+                </div>
+                <div style="background:var(--green-light);border:1px solid #BBF7D0;border-radius:var(--radius);padding:12px 14px;">
+                    <div style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;">Target Measurable Outcome</div>
+                    <div style="font-size:12px;font-weight:600;color:#14532D;margin-top:4px;">${plan.target_measurable_outcome || 'Consistent student pass rate'}</div>
+                </div>
+            </div>
+
+            <!-- Review Timeline & Disclaimer -->
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--gray-200);font-size:12px;color:var(--gray-500);">
+                <span><i class="fas fa-calendar-alt" style="margin-right:4px;"></i>Review Timeline: <strong>${plan.suggested_review_timeline || '6-8 Weeks'}</strong></span>
+                <span style="font-style:italic;">Model ${t.model_version}</span>
+            </div>
+        `;
+
+        modal.style.display = 'flex';
+    }
+
+    function closeTeacherModal() {
+        const modal = document.getElementById('teacher-modal');
+        if (modal) modal.style.display = 'none';
     }
 
     // ─── Forecasts ───────────────────────────────────────────────────────
@@ -1499,5 +1871,26 @@
     // ─── Init ────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', loadAllData);
     </script>
+
+    <!-- Teacher Improvement Plan Modal -->
+    <div id="teacher-modal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeTeacherModal()">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:42px;height:42px;border-radius:50%;background:rgba(212,20,110,0.1);color:var(--pink);display:flex;align-items:center;justify-content:center;font-size:18px;">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div>
+                        <h3 id="modal-teacher-name" style="margin:0;font-size:17px;font-weight:700;color:var(--dark);">Teacher Name</h3>
+                        <p id="modal-teacher-subtitle" style="margin:2px 0 0;font-size:12px;color:var(--gray-500);">ID • Specialization • Experience</p>
+                    </div>
+                </div>
+                <button class="btn-close" onclick="closeTeacherModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-teacher-body">
+                <!-- Content dynamically injected -->
+            </div>
+        </div>
+    </div>
 </body>
 </html>
