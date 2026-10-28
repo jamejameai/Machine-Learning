@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CIIS School Intelligence AI — AI-powered intelligence dashboard for school management">
+    <title>CIIS School Intelligence AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --pink: #D4146E;
+            --pink-light: #F8E1ED;
+            --pink-hover: #B01059;
+            --dark: #171717;
+            --dark-secondary: #2D2D2D;
+            --white: #FFFFFF;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --green: #059669;
+            --green-light: #D1FAE5;
+            --yellow: #D97706;
+            --yellow-light: #FEF3C7;
+            --red: #DC2626;
+            --red-light: #FEE2E2;
+            --blue: #2563EB;
+            --blue-light: #DBEAFE;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --radius: 8px;
+            --radius-lg: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gray-50);
+            color: var(--dark);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ─── Sidebar ─────────────────────────────────────────── */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--dark);
+            color: var(--white);
+            z-index: 100;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--dark-secondary);
+        }
+
+        .sidebar-header h1 {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .sidebar-header h1 span {
+            color: var(--pink);
+        }
+
+        .sidebar-header p {
+            font-size: 11px;
+            color: var(--gray-400);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-section {
+            padding: 16px 0;
+        }
+
+        .nav-section-title {
+            padding: 0 20px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            color: var(--gray-300);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--white);
+        }
+
+        .nav-item.active {
+            background: rgba(212,20,110,0.1);
+            color: var(--pink);
+            border-left-color: var(--pink);
+            font-weight: 500;
+        }
+
+        .nav-item i { width: 18px; text-align: center; font-size: 14px; }
+
+        .nav-badge {
+            margin-left: auto;
+            background: var(--pink);
+            color: var(--white);
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 10px;
+        }
+
+        /* ─── Main Content ────────────────────────────────────── */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar-left h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .topbar-left p {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-top: 2px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.online {
+            background: var(--green-light);
+            color: var(--green);
+        }
+
+        .status-badge.offline {
+            background: var(--red-light);
+            color: var(--red);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--pink);
+            color: var(--white);
+        }
+
+        .btn-primary:hover { background: var(--pink-hover); }
+
+        .btn-outline {
+            background: var(--white);
+            color: var(--gray-600);
+            border: 1px solid var(--gray-300);
+        }
+
+        .btn-outline:hover { background: var(--gray-50); border-color: var(--gray-400); }
+
+        .content { padding: 24px 32px; }
+
+        /* ─── Page Sections ───────────────────────────────────── */
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+
+        /* ─── Cards ───────────────────────────────────────────── */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .metric-card:hover { box-shadow: var(--shadow-md); }
+
+        .metric-card .metric-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .metric-card .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 6px 0 4px;
+            letter-spacing: -0.02em;
+        }
+
+        .metric-card .metric-detail {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        .metric-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .metric-icon.pink { background: var(--pink-light); color: var(--pink); }
+        .metric-icon.green { background: var(--green-light); color: var(--green); }
+        .metric-icon.yellow { background: var(--yellow-light); color: var(--yellow); }
+        .metric-icon.blue { background: var(--blue-light); color: var(--blue); }
+        .metric-icon.red { background: var(--red-light); color: var(--red); }
+
+        /* ─── Panels ──────────────────────────────────────────── */
+        .panel {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .panel-body { padding: 20px; }
+
+        .panel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        /* ─── Tables ──────────────────────────────────────────── */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 10px 12px;
+            font-weight: 600;
+            color: var(--gray-600);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border-bottom: 2px solid var(--gray-200);
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--gray-50);
+        }
+
+        /* ─── Badges & Tags ───────────────────────────────────── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-high { background: var(--red-light); color: var(--red); }
+        .badge-medium { background: var(--yellow-light); color: var(--yellow); }
+        .badge-low { background: var(--green-light); color: var(--green); }
+        .badge-critical { background: #7C2D12; color: #FED7AA; }
+        .badge-new { background: var(--blue-light); color: var(--blue); }
+        .badge-active { background: var(--green-light); color: var(--green); }
+
+        .priority-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .priority-dot.critical { background: #DC2626; }
+        .priority-dot.high { background: #EA580C; }
+        .priority-dot.medium { background: #D97706; }
+        .priority-dot.low { background: #059669; }
+
+        /* ─── Charts ──────────────────────────────────────────── */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-height: 300px;
+        }
+
+        /* ─── Recommendation Cards ────────────────────────────── */
+        .rec-card {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: box-shadow 0.15s ease;
+        }
+
+        .rec-card:hover { box-shadow: var(--shadow-md); }
+
+        .rec-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .rec-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            flex: 1;
+        }
+
+        .rec-card-body {
+            font-size: 13px;
+            color: var(--gray-600);
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .rec-card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 11px;
+            color: var(--gray-500);
+        }
+
+        .rec-card-meta span { display: flex; align-items: center; gap: 4px; }
+
+        .rec-action-btn {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            border: 1px solid var(--gray-300);
+            background: var(--white);
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .rec-action-btn:hover { border-color: var(--pink); color: var(--pink); }
+
+        /* ─── Model Health ────────────────────────────────────── */
+        .model-card {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .model-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+        }
+
+        .metric-mini {
+            text-align: center;
+            padding: 8px;
+            background: var(--gray-50);
+            border-radius: var(--radius);
+        }
+
+        .metric-mini .label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+        }
+
+        .metric-mini .value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-top: 2px;
+        }
+
+        /* ─── Empty State ─────────────────────────────────────── */
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--gray-400);
+        }
+
+        .empty-state i { font-size: 48px; margin-bottom: 16px; }
+        .empty-state h3 { font-size: 16px; font-weight: 600; color: var(--gray-600); margin-bottom: 8px; }
+        .empty-state p { font-size: 13px; max-width: 400px; margin: 0 auto; }
+
+        /* ─── Loading ─────────────────────────────────────────── */
+        .loading-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--pink);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ─── Responsive ──────────────────────────────────────── */
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--dark);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .mobile-toggle { display: block; }
+            .topbar { padding: 12px 16px; }
+            .content { padding: 16px; }
+            .metric-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+            .panel-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ─── Feature Importance Bar ──────────────────────────── */
+        .feature-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .feature-name {
+            width: 160px;
+            font-size: 12px;
+            color: var(--gray-600);
+            flex-shrink: 0;
+        }
+
+        .feature-bar-track {
+            flex: 1;
+            height: 20px;
+            background: var(--gray-100);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .feature-bar-fill {
+            height: 100%;
+            background: var(--pink);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .feature-value {
+            width: 50px;
+            text-align: right;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1><span>CIIS</span> School Intelligence</h1>
+            <p>AI-Powered Analytics</p>
+        </div>
+
+        <nav class="nav-section">
+            <div class="nav-section-title">Overview</div>
+            <a class="nav-item active" data-page="overview" onclick="showPage('overview')">
+                <i class="fas fa-chart-line"></i> Executive Dashboard
+            </a>
+        </nav>
+
+        <nav class="nav-section">
+            <div class="nav-section-title">Intelligence</div>
+            <a class="nav-item" data-page="students" onclick="showPage('students')">
+                <i class="fas fa-user-graduate"></i> Student Intelligence
+                <span class="nav-badge" id="nav-risk-count">—</span>
+            </a>
+            <a class="nav-item" data-page="classes" onclick="showPage('classes')">
+                <i class="fas fa-chalkboard"></i> Class & Subject
+            </a>
+            <a class="nav-item" data-page="teachers" onclick="showPage('teachers')">
+                <i class="fas fa-user-tie"></i> Teacher Support
+            </a>
+            <a class="nav-item" data-page="forecasts" onclick="showPage('forecasts')">
+                <i class="fas fa-chart-area"></i> Forecasts
+            </a>
+        </nav>
+
+        <nav class="nav-section">
+            <div class="nav-section-title">Actions</div>
+            <a class="nav-item" data-page="recommendations" onclick="showPage('recommendations')">
+                <i class="fas fa-lightbulb"></i> Recommendations
+                <span class="nav-badge" id="nav-rec-count">—</span>
+            </a>
+        </nav>
+
+        <nav class="nav-section">
+            <div class="nav-section-title">System</div>
+            <a class="nav-item" data-page="model-health" onclick="showPage('model-health')">
+                <i class="fas fa-heartbeat"></i> Model Health
+            </a>
+            <a class="nav-item" data-page="data-quality" onclick="showPage('data-quality')">
+                <i class="fas fa-database"></i> Data Quality
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="topbar">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="topbar-left">
+                    <h2 id="page-title">Executive Dashboard</h2>
+                    <p id="page-subtitle">School-wide intelligence overview</p>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="status-badge online" id="system-status">
+                    <span class="status-dot"></span>
+                    <span>System Online</span>
+                </div>
+                <button class="btn btn-outline" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </header>
+
+        <div class="content">
+            <!-- ─── Executive Overview ──────────────────────── -->
+            <section class="page-section active" id="page-overview">
+                <div class="loading-spinner" id="overview-loading">
+                    <div class="spinner"></div>
+                </div>
+                <div id="overview-content" style="display:none;">
+                    <div class="metric-grid" id="overview-metrics"></div>
+                    <div class="panel-grid">
+                        <div class="panel">
+                            <div class="panel-header">
+                                <h3><i class="fas fa-user-graduate" style="color:var(--pink);margin-right:8px;"></i>Student Risk Distribution</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="chart-container"><canvas id="chart-risk-dist"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="panel">
+                            <div class="panel-header">
+                                <h3><i class="fas fa-chart-bar" style="color:var(--blue);margin-right:8px;"></i>Performance by Grade Level</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="chart-container"><canvas id="chart-grade-perf"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3><i class="fas fa-lightbulb" style="color:var(--yellow);margin-right:8px;"></i>Priority Recommendations</h3>
+                            <a class="btn btn-outline" onclick="showPage('recommendations')" style="font-size:12px;">View All</a>
+                        </div>
+                        <div class="panel-body" id="overview-recommendations"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─── Student Intelligence ────────────────────── -->
+            <section class="page-section" id="page-students">
+                <div class="metric-grid" id="student-metrics"></div>
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Students Needing Support Review</h3>
+                        <div style="display:flex;gap:8px;">
+                            <select id="risk-filter" onchange="filterStudents()" class="btn btn-outline" style="font-size:12px;">
+                                <option value="">All Risk Levels</option>
+                                <option value="high">High Risk</option>
+                                <option value="medium">Medium Risk</option>
+                                <option value="low">Low Risk</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <table class="data-table" id="student-table">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Risk Level</th>
+                                    <th>Score</th>
+                                    <th>Key Factors</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─── Class & Subject ─────────────────────────── -->
+            <section class="page-section" id="page-classes">
+                <div class="panel-grid">
+                    <div class="panel">
+                        <div class="panel-header"><h3>Subject Performance</h3></div>
+                        <div class="panel-body">
+                            <div class="chart-container"><canvas id="chart-subjects"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><h3>Attendance by Grade</h3></div>
+                        <div class="panel-body">
+                            <div class="chart-container"><canvas id="chart-attendance-grade"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header"><h3>Subjects Needing Attention</h3></div>
+                    <div class="panel-body" id="struggling-subjects-container"></div>
+                </div>
+            </section>
+
+            <!-- ─── Teacher Support ─────────────────────────── -->
+            <section class="page-section" id="page-teachers">
+                <div style="background:var(--blue-light);border:1px solid #93C5FD;border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;font-size:13px;color:#1E40AF;">
+                    <i class="fas fa-info-circle"></i>
+                    This section provides aggregate insights to support teachers. It is not a ranking system. Many factors affect class outcomes beyond teacher control.
+                </div>
+                <div class="panel-grid">
+                    <div class="panel">
+                        <div class="panel-header"><h3>Teacher Workload Distribution</h3></div>
+                        <div class="panel-body" id="teacher-workload-container"></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><h3>Collaboration Opportunities</h3></div>
+                        <div class="panel-body" id="collaboration-container"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─── Forecasts ───────────────────────────────── -->
+            <section class="page-section" id="page-forecasts">
+                <div class="panel-grid">
+                    <div class="panel">
+                        <div class="panel-header"><h3>Enrollment Summary</h3></div>
+                        <div class="panel-body" id="enrollment-container"></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><h3>Enrollment Projection</h3></div>
+                        <div class="panel-body" id="forecast-container"></div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header"><h3>Academic Progress by Grade</h3></div>
+                    <div class="panel-body">
+                        <div class="chart-container"><canvas id="chart-academic-progress"></canvas></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─── Recommendations ─────────────────────────── -->
+            <section class="page-section" id="page-recommendations">
+                <div class="metric-grid" id="rec-metrics"></div>
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>All Recommendations</h3>
+                        <div style="display:flex;gap:8px;">
+                            <select id="rec-priority-filter" onchange="filterRecommendations()" class="btn btn-outline" style="font-size:12px;">
+                                <option value="">All Priorities</option>
+                                <option value="critical">Critical</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                            <select id="rec-area-filter" onchange="filterRecommendations()" class="btn btn-outline" style="font-size:12px;">
+                                <option value="">All Areas</option>
+                                <option value="student">Student</option>
+                                <option value="class">Class</option>
+                                <option value="subject">Subject</option>
+                                <option value="school_operations">Operations</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="recommendations-container"></div>
+                </div>
+            </section>
+
+            <!-- ─── Model Health ────────────────────────────── -->
+            <section class="page-section" id="page-model-health">
+                <div id="model-health-container"></div>
+            </section>
+
+            <!-- ─── Data Quality ────────────────────────────── -->
+            <section class="page-section" id="page-data-quality">
+                <div id="data-quality-container"></div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+    // ─── State ───────────────────────────────────────────────────────────
+    let dashboardData = {};
+    let allPredictions = [];
+    let allRecommendations = [];
+    let charts = {};
+
+    // ─── Navigation ──────────────────────────────────────────────────────
+    const pageTitles = {
+        'overview': ['Executive Dashboard', 'School-wide intelligence overview'],
+        'students': ['Student Intelligence', 'Risk predictions and support recommendations'],
+        'classes': ['Class & Subject Analytics', 'Performance trends and comparisons'],
+        'teachers': ['Teacher Support', 'Workload and collaboration insights'],
+        'forecasts': ['Forecasts', 'Enrollment projections and academic progress'],
+        'recommendations': ['Recommendations', 'Evidence-based action items'],
+        'model-health': ['Model Health', 'ML model status and evaluation metrics'],
+        'data-quality': ['Data Quality', 'Data source audit and quality assessment'],
+    };
+
+    function showPage(page) {
+        document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+        document.getElementById('page-' + page).classList.add('active');
+        document.querySelector(`[data-page="${page}"]`).classList.add('active');
+
+        const [title, subtitle] = pageTitles[page] || ['', ''];
+        document.getElementById('page-title').textContent = title;
+        document.getElementById('page-subtitle').textContent = subtitle;
+
+        // Close mobile sidebar
+        document.getElementById('sidebar').classList.remove('open');
+    }
+
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    // ─── Data Loading ────────────────────────────────────────────────────
+    async function fetchJSON(url) {
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return await res.json();
+        } catch (e) {
+            console.error(`Failed to fetch ${url}:`, e);
+            return null;
+        }
+    }
+
+    async function loadAllData() {
+        const [overview, predictions, subjects, gradePerf, attendance,
+               struggling, workload, collaboration, enrollment, forecast,
+               progress, modelStatus, dataQuality, recommendations] = await Promise.all([
+            fetchJSON('/api/v1/dashboard/overview'),
+            fetchJSON('/api/v1/students/predictions?limit=500'),
+            fetchJSON('/api/v1/classes/analytics/subjects'),
+            fetchJSON('/api/v1/classes/analytics/grades'),
+            fetchJSON('/api/v1/classes/analytics/attendance'),
+            fetchJSON('/api/v1/classes/analytics/struggling'),
+            fetchJSON('/api/v1/teachers/support/workload'),
+            fetchJSON('/api/v1/teachers/support/collaboration'),
+            fetchJSON('/api/v1/school/enrollment'),
+            fetchJSON('/api/v1/school/forecasts'),
+            fetchJSON('/api/v1/school/academic-progress'),
+            fetchJSON('/api/v1/models/status'),
+            fetchJSON('/api/v1/data/quality'),
+            fetchJSON('/api/v1/recommendations'),
+        ]);
+
+        dashboardData = { overview, subjects, gradePerf, attendance, struggling,
+                          workload, collaboration, enrollment, forecast, progress,
+                          modelStatus, dataQuality };
+        allPredictions = predictions?.predictions || [];
+        allRecommendations = recommendations?.recommendations || [];
+
+        renderAll();
+    }
+
+    // ─── Rendering ───────────────────────────────────────────────────────
+    function renderAll() {
+        document.getElementById('overview-loading').style.display = 'none';
+        document.getElementById('overview-content').style.display = 'block';
+
+        renderOverview();
+        renderStudents();
+        renderClasses();
+        renderTeachers();
+        renderForecasts();
+        renderRecommendations();
+        renderModelHealth();
+        renderDataQuality();
+        updateNavBadges();
+    }
+
+    function updateNavBadges() {
+        const highRisk = allPredictions.filter(p => p.risk_level === 'high').length;
+        document.getElementById('nav-risk-count').textContent = highRisk || '0';
+        document.getElementById('nav-rec-count').textContent = allRecommendations.length || '0';
+    }
+
+    // ─── Overview ────────────────────────────────────────────────────────
+    function renderOverview() {
+        const o = dashboardData.overview;
+        if (!o) return;
+
+        const m = o.school_metrics || {};
+        const metricsHtml = `
+            <div class="metric-card">
+                <div class="metric-icon pink"><i class="fas fa-user-graduate"></i></div>
+                <div class="metric-label">Total Students</div>
+                <div class="metric-value">${m.total_students || 0}</div>
+                <div class="metric-detail">Active enrollment</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon green"><i class="fas fa-calendar-check"></i></div>
+                <div class="metric-label">Attendance Rate</div>
+                <div class="metric-value">${m.attendance_rate ? m.attendance_rate + '%' : 'N/A'}</div>
+                <div class="metric-detail">School-wide average</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon blue"><i class="fas fa-chart-line"></i></div>
+                <div class="metric-label">Average Grade</div>
+                <div class="metric-value">${m.avg_grade ? m.avg_grade + '%' : 'N/A'}</div>
+                <div class="metric-detail">All subjects combined</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon yellow"><i class="fas fa-check-circle"></i></div>
+                <div class="metric-label">Pass Rate</div>
+                <div class="metric-value">${m.pass_rate ? m.pass_rate + '%' : 'N/A'}</div>
+                <div class="metric-detail">Above 75% threshold</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="metric-label">Students Needing Review</div>
+                <div class="metric-value">${(o.student_risk_summary?.high || 0)}</div>
+                <div class="metric-detail">High risk identified</div>
+            </div>
+        `;
+        document.getElementById('overview-metrics').innerHTML = metricsHtml;
+
+        // Risk distribution chart
+        renderRiskChart(o.student_risk_summary || {});
+
+        // Grade performance chart
+        renderGradePerformanceChart();
+
+        // Top recommendations
+        const topRecs = allRecommendations.slice(0, 3);
+        document.getElementById('overview-recommendations').innerHTML = topRecs.length
+            ? topRecs.map(r => renderRecCard(r)).join('')
+            : '<div class="empty-state"><p>No recommendations generated yet.</p></div>';
+    }
+
+    function renderRiskChart(risk) {
+        if (charts['riskDist']) charts['riskDist'].destroy();
+        const ctx = document.getElementById('chart-risk-dist');
+        if (!ctx) return;
+
+        charts['riskDist'] = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+                datasets: [{
+                    data: [risk.low || 0, risk.medium || 0, risk.high || 0],
+                    backgroundColor: ['#059669', '#D97706', '#DC2626'],
+                    borderWidth: 0,
+                    hoverOffset: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { position: 'bottom', labels: { padding: 16, font: { size: 12, family: 'Inter' } } },
+                }
+            }
+        });
+    }
+
+    function renderGradePerformanceChart() {
+        const data = dashboardData.gradePerf?.grade_levels || [];
+        if (!data.length) return;
+        if (charts['gradePerf']) charts['gradePerf'].destroy();
+
+        const ctx = document.getElementById('chart-grade-perf');
+        charts['gradePerf'] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => `Grade ${d.grade_level}`),
+                datasets: [
+                    {
+                        label: 'Average Score',
+                        data: data.map(d => d.avg_score),
+                        backgroundColor: '#D4146E',
+                        borderRadius: 4,
+                    },
+                    {
+                        label: 'Pass Rate %',
+                        data: data.map(d => d.pass_rate),
+                        backgroundColor: '#2563EB',
+                        borderRadius: 4,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 12, family: 'Inter' } } } },
+                scales: {
+                    y: { beginAtZero: true, max: 100, grid: { color: '#F3F4F6' } },
+                    x: { grid: { display: false } },
+                }
+            }
+        });
+    }
+
+    // ─── Students ────────────────────────────────────────────────────────
+    function renderStudents() {
+        const high = allPredictions.filter(p => p.risk_level === 'high').length;
+        const medium = allPredictions.filter(p => p.risk_level === 'medium').length;
+        const low = allPredictions.filter(p => p.risk_level === 'low').length;
+
+        document.getElementById('student-metrics').innerHTML = `
+            <div class="metric-card">
+                <div class="metric-icon red"><i class="fas fa-exclamation-circle"></i></div>
+                <div class="metric-label">High Risk</div>
+                <div class="metric-value">${high}</div>
+                <div class="metric-detail">Immediate review recommended</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon yellow"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="metric-label">Medium Risk</div>
+                <div class="metric-value">${medium}</div>
+                <div class="metric-detail">Monitoring recommended</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon green"><i class="fas fa-check-circle"></i></div>
+                <div class="metric-label">Low Risk</div>
+                <div class="metric-value">${low}</div>
+                <div class="metric-detail">On track</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon blue"><i class="fas fa-users"></i></div>
+                <div class="metric-label">Total Analyzed</div>
+                <div class="metric-value">${allPredictions.length}</div>
+                <div class="metric-detail">Active students</div>
+            </div>
+        `;
+
+        filterStudents();
+    }
+
+    function filterStudents() {
+        const filter = document.getElementById('risk-filter').value;
+        let filtered = allPredictions;
+        if (filter) filtered = filtered.filter(p => p.risk_level === filter);
+
+        // Sort by score descending
+        filtered.sort((a, b) => (b.prediction_score || 0) - (a.prediction_score || 0));
+
+        const tbody = document.getElementById('student-table-body');
+        tbody.innerHTML = filtered.slice(0, 100).map(p => {
+            const factors = (p.contributing_factors || [])
+                .filter(f => f.concern)
+                .slice(0, 3)
+                .map(f => `<span style="font-size:11px;">${f.factor}: ${f.value}</span>`)
+                .join(', ') || 'No concerns flagged';
+
+            return `<tr>
+                <td><strong>${p.student_id}</strong></td>
+                <td><span class="badge badge-${p.risk_level}">${p.risk_level.toUpperCase()}</span></td>
+                <td>${p.prediction_score ? (p.prediction_score * 100).toFixed(1) + '%' : 'N/A'}</td>
+                <td style="max-width:300px;">${factors}</td>
+                <td><span class="badge badge-new">${p.prediction_label === 'needs_support' ? 'Review Needed' : 'On Track'}</span></td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ─── Classes ─────────────────────────────────────────────────────────
+    function renderClasses() {
+        // Subject performance chart
+        const subjects = dashboardData.subjects?.subjects || [];
+        if (subjects.length && !charts['subjects']) {
+            const ctx = document.getElementById('chart-subjects');
+            charts['subjects'] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: subjects.map(s => s.subject.length > 12 ? s.subject.substring(0, 12) + '…' : s.subject),
+                    datasets: [{
+                        label: 'Average Score',
+                        data: subjects.map(s => s.avg_score),
+                        backgroundColor: subjects.map(s => s.avg_score < 70 ? '#DC2626' : s.avg_score < 75 ? '#D97706' : '#D4146E'),
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { beginAtZero: true, max: 100, grid: { color: '#F3F4F6' } },
+                        y: { grid: { display: false } },
+                    }
+                }
+            });
+        }
+
+        // Attendance by grade chart
+        const attData = dashboardData.attendance?.grades || [];
+        if (attData.length && !charts['attGrade']) {
+            const ctx = document.getElementById('chart-attendance-grade');
+            charts['attGrade'] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: attData.map(a => `Grade ${a.grade_level}`),
+                    datasets: [
+                        { label: 'Attendance %', data: attData.map(a => a.attendance_rate), backgroundColor: '#059669', borderRadius: 4 },
+                        { label: 'Late %', data: attData.map(a => a.late_rate), backgroundColor: '#D97706', borderRadius: 4 },
+                        { label: 'Absent %', data: attData.map(a => a.absence_rate), backgroundColor: '#DC2626', borderRadius: 4 },
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'bottom', labels: { font: { size: 12, family: 'Inter' } } } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#F3F4F6' } },
+                        x: { grid: { display: false } },
+                    }
+                }
+            });
+        }
+
+        // Struggling subjects
+        const struggling = dashboardData.struggling?.struggling_subjects || [];
+        const container = document.getElementById('struggling-subjects-container');
+        if (!struggling.length) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle"></i><h3>No Critical Subjects</h3><p>All subjects are within acceptable performance ranges.</p></div>';
+        } else {
+            container.innerHTML = `<table class="data-table"><thead><tr>
+                <th>Grade</th><th>Subject</th><th>% Below Threshold</th><th>Struggling / Total</th><th>Avg Score</th><th>Severity</th>
+            </tr></thead><tbody>${struggling.map(s => `<tr>
+                <td>Grade ${s.grade_level}</td>
+                <td><strong>${s.subject}</strong></td>
+                <td>${s.pct_below_threshold}%</td>
+                <td>${s.n_struggling} / ${s.n_total}</td>
+                <td>${s.avg_score}%</td>
+                <td><span class="badge badge-${s.severity === 'critical' ? 'critical' : s.severity === 'high' ? 'high' : 'medium'}">${s.severity}</span></td>
+            </tr>`).join('')}</tbody></table>`;
+        }
+    }
+
+    // ─── Teachers ────────────────────────────────────────────────────────
+    function renderTeachers() {
+        const workload = dashboardData.workload?.teachers || [];
+        const wlContainer = document.getElementById('teacher-workload-container');
+
+        if (workload.length) {
+            wlContainer.innerHTML = `<table class="data-table"><thead><tr>
+                <th>Teacher</th><th>Classes</th><th>Subjects</th><th>Grade Levels</th><th>Workload</th>
+            </tr></thead><tbody>${workload.slice(0, 15).map(t => `<tr>
+                <td><strong>${t.teacher_name}</strong></td>
+                <td>${t.n_classes}</td>
+                <td>${t.n_subjects}</td>
+                <td>${t.grade_levels.map(g => 'G' + g).join(', ')}</td>
+                <td><span class="badge badge-${t.workload_level === 'high' ? 'high' : t.workload_level === 'moderate' ? 'medium' : 'low'}">${t.workload_level}</span></td>
+            </tr>`).join('')}</tbody></table>`;
+        } else {
+            wlContainer.innerHTML = '<div class="empty-state"><p>No workload data available.</p></div>';
+        }
+
+        const collab = dashboardData.collaboration?.opportunities || [];
+        const collabContainer = document.getElementById('collaboration-container');
+        if (collab.length) {
+            collabContainer.innerHTML = collab.map(c => `
+                <div class="rec-card">
+                    <div class="rec-card-title"><i class="fas fa-handshake" style="color:var(--blue);margin-right:8px;"></i>${c.subject}</div>
+                    <div class="rec-card-body">${c.n_teachers} teachers: ${c.teacher_names.join(', ')}</div>
+                    <div class="rec-card-meta"><span><i class="fas fa-lightbulb"></i> ${c.suggestion}</span></div>
+                </div>
+            `).join('');
+        } else {
+            collabContainer.innerHTML = '<div class="empty-state"><p>No collaboration data available.</p></div>';
+        }
+    }
+
+    // ─── Forecasts ───────────────────────────────────────────────────────
+    function renderForecasts() {
+        const enrollment = dashboardData.enrollment;
+        const eContainer = document.getElementById('enrollment-container');
+        if (enrollment) {
+            const byGrade = enrollment.by_grade_level || {};
+            eContainer.innerHTML = `
+                <div class="metrics-row" style="margin-bottom:16px;">
+                    <div class="metric-mini"><div class="label">Active</div><div class="value">${enrollment.active}</div></div>
+                    <div class="metric-mini"><div class="label">Withdrawn</div><div class="value">${enrollment.withdrawn}</div></div>
+                    <div class="metric-mini"><div class="label">Transferred</div><div class="value">${enrollment.transferred}</div></div>
+                    <div class="metric-mini"><div class="label">Retention</div><div class="value">${enrollment.retention_rate}%</div></div>
+                </div>
+                <table class="data-table"><thead><tr><th>Grade Level</th><th>Students</th></tr></thead>
+                <tbody>${Object.entries(byGrade).map(([g, n]) => `<tr><td>Grade ${g}</td><td>${n}</td></tr>`).join('')}</tbody></table>
+            `;
+        }
+
+        const forecast = dashboardData.forecast?.enrollment_forecast;
+        const fContainer = document.getElementById('forecast-container');
+        if (forecast) {
+            fContainer.innerHTML = `
+                <div style="margin-bottom:16px;">
+                    <strong>Current enrollment:</strong> ${forecast.current_enrollment}<br>
+                    <strong>Retention rate:</strong> ${forecast.current_retention_rate}%
+                </div>
+                <table class="data-table"><thead><tr><th>Period</th><th>Projected</th><th>Confidence</th></tr></thead>
+                <tbody>${(forecast.projections || []).map(p => `<tr>
+                    <td>${p.period}</td><td>${p.projected_enrollment}</td><td style="font-size:11px;color:var(--gray-500);">${p.confidence}</td>
+                </tr>`).join('')}</tbody></table>
+                <div style="margin-top:12px;padding:12px;background:var(--yellow-light);border-radius:var(--radius);font-size:12px;color:#92400E;">
+                    <strong>Assumptions:</strong><br>${(forecast.assumptions || []).map(a => '• ' + a).join('<br>')}
+                </div>
+            `;
+        }
+
+        // Academic progress chart
+        const progress = dashboardData.progress?.progress || [];
+        if (progress.length && !charts['progress']) {
+            const ctx = document.getElementById('chart-academic-progress');
+            const datasets = progress.map((g, i) => ({
+                label: `Grade ${g.grade_level}`,
+                data: (g.periods || []).map(p => p.avg_score),
+                borderColor: ['#D4146E', '#2563EB', '#059669', '#D97706', '#7C3AED', '#DC2626'][i % 6],
+                backgroundColor: 'transparent',
+                tension: 0.3,
+                pointRadius: 4,
+            }));
+            const labels = (progress[0]?.periods || []).map(p => p.assessment_type);
+
+            charts['progress'] = new Chart(ctx, {
+                type: 'line',
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'bottom', labels: { font: { size: 12, family: 'Inter' } } } },
+                    scales: {
+                        y: { beginAtZero: false, grid: { color: '#F3F4F6' } },
+                        x: { grid: { display: false } },
+                    }
+                }
+            });
+        }
+    }
+
+    // ─── Recommendations ─────────────────────────────────────────────────
+    function renderRecommendations() {
+        const byPriority = {};
+        allRecommendations.forEach(r => { byPriority[r.priority] = (byPriority[r.priority] || 0) + 1; });
+
+        document.getElementById('rec-metrics').innerHTML = `
+            <div class="metric-card">
+                <div class="metric-icon red"><i class="fas fa-fire"></i></div>
+                <div class="metric-label">Critical</div>
+                <div class="metric-value">${byPriority.critical || 0}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon yellow"><i class="fas fa-flag"></i></div>
+                <div class="metric-label">High Priority</div>
+                <div class="metric-value">${byPriority.high || 0}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon blue"><i class="fas fa-bookmark"></i></div>
+                <div class="metric-label">Medium</div>
+                <div class="metric-value">${byPriority.medium || 0}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon green"><i class="fas fa-leaf"></i></div>
+                <div class="metric-label">Low</div>
+                <div class="metric-value">${byPriority.low || 0}</div>
+            </div>
+        `;
+
+        filterRecommendations();
+    }
+
+    function filterRecommendations() {
+        const priority = document.getElementById('rec-priority-filter').value;
+        const area = document.getElementById('rec-area-filter').value;
+
+        let filtered = allRecommendations;
+        if (priority) filtered = filtered.filter(r => r.priority === priority);
+        if (area) filtered = filtered.filter(r => r.area === area);
+
+        const container = document.getElementById('recommendations-container');
+        container.innerHTML = filtered.length
+            ? filtered.map(r => renderRecCard(r)).join('')
+            : '<div class="empty-state"><i class="fas fa-check-circle"></i><h3>No recommendations match your filter</h3></div>';
+    }
+
+    function renderRecCard(r) {
+        return `<div class="rec-card">
+            <div class="rec-card-header">
+                <div class="rec-card-title">
+                    <span class="priority-dot ${r.priority}"></span>
+                    ${r.title}
+                </div>
+                <span class="badge badge-${r.priority}">${r.priority}</span>
+            </div>
+            <div class="rec-card-body">${r.finding_summary}</div>
+            ${r.recommended_action ? `<div style="font-size:12px;color:var(--gray-700);margin-bottom:10px;padding:10px;background:var(--gray-50);border-radius:4px;">
+                <strong>Recommended Action:</strong> ${r.recommended_action}
+            </div>` : ''}
+            <div class="rec-card-meta">
+                <span><i class="fas fa-tag"></i> ${r.area}</span>
+                ${r.suggested_owner ? `<span><i class="fas fa-user"></i> ${r.suggested_owner}</span>` : ''}
+                <span><i class="fas fa-clock"></i> ${r.status}</span>
+                <span>
+                    <button class="rec-action-btn" onclick="updateRecStatus(${r.id}, 'reviewed')">Mark Reviewed</button>
+                    <button class="rec-action-btn" onclick="updateRecStatus(${r.id}, 'approved')">Approve</button>
+                    <button class="rec-action-btn" onclick="updateRecStatus(${r.id}, 'dismissed')">Dismiss</button>
+                </span>
+            </div>
+        </div>`;
+    }
+
+    async function updateRecStatus(id, status) {
+        try {
+            const res = await fetch(`/api/v1/recommendations/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status }),
+            });
+            if (res.ok) {
+                const rec = allRecommendations.find(r => r.id === id);
+                if (rec) rec.status = status;
+                filterRecommendations();
+            }
+        } catch (e) { console.error('Failed to update recommendation:', e); }
+    }
+
+    // ─── Model Health ────────────────────────────────────────────────────
+    function renderModelHealth() {
+        const status = dashboardData.modelStatus;
+        if (!status) return;
+
+        const container = document.getElementById('model-health-container');
+        const models = status.models || [];
+
+        let html = `
+            <div style="background:var(--green-light);border:1px solid #6EE7B7;border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;font-size:13px;color:#065F46;">
+                <i class="fas fa-check-circle"></i>
+                Best model: <strong>${status.best_model || 'None'}</strong> |
+                Training data: ${status.training_data || 'N/A'} |
+                Last trained: ${status.last_trained ? new Date(status.last_trained).toLocaleString() : 'Never'}
+            </div>
+        `;
+
+        models.forEach(m => {
+            const met = m.metrics || {};
+            const isBest = m.model_name === status.best_model;
+
+            html += `<div class="model-card" style="${isBest ? 'border-color:var(--pink);border-width:2px;' : ''}">
+                <h4>
+                    ${isBest ? '<i class="fas fa-crown" style="color:var(--pink);"></i>' : '<i class="fas fa-flask" style="color:var(--gray-400);"></i>'}
+                    ${m.model_name}
+                    <span class="badge badge-${m.status === 'active' ? 'active' : m.status === 'below_acceptance' ? 'high' : 'medium'}">${m.status}</span>
+                </h4>
+                <div class="metrics-row">
+                    <div class="metric-mini"><div class="label">Accuracy</div><div class="value">${met.accuracy ? (met.accuracy * 100).toFixed(1) + '%' : 'N/A'}</div></div>
+                    <div class="metric-mini"><div class="label">Precision</div><div class="value">${met.precision ? (met.precision * 100).toFixed(1) + '%' : 'N/A'}</div></div>
+                    <div class="metric-mini"><div class="label">Recall</div><div class="value">${met.recall ? (met.recall * 100).toFixed(1) + '%' : 'N/A'}</div></div>
+                    <div class="metric-mini"><div class="label">F1 Score</div><div class="value">${met.f1 ? (met.f1 * 100).toFixed(1) + '%' : 'N/A'}</div></div>
+                    <div class="metric-mini"><div class="label">ROC-AUC</div><div class="value">${met.roc_auc ? (met.roc_auc * 100).toFixed(1) + '%' : 'N/A'}</div></div>
+                </div>
+                ${m.feature_importances ? `<div style="margin-top:16px;">
+                    <h4 style="font-size:12px;margin-bottom:10px;color:var(--gray-600);">Feature Importance</h4>
+                    ${renderFeatureBars(m.feature_importances)}
+                </div>` : ''}
+                <div style="margin-top:12px;font-size:12px;color:var(--gray-500);">
+                    Train: ${m.training_samples || 'N/A'} samples | Test: ${m.test_samples || 'N/A'} samples |
+                    Acceptance: F1 ≥ ${(m.acceptance_threshold_f1 * 100).toFixed(0)}% |
+                    ${m.meets_acceptance_criteria ? '✓ Meets criteria' : '✗ Below criteria'}
+                </div>
+            </div>`;
+        });
+
+        // Feature names
+        if (status.feature_names) {
+            html += `<div class="panel" style="margin-top:20px;">
+                <div class="panel-header"><h3>Feature Definitions</h3></div>
+                <div class="panel-body">
+                    <table class="data-table"><thead><tr><th>Feature</th><th>Description</th></tr></thead>
+                    <tbody>${status.feature_names.map(f => `<tr><td><code>${f}</code></td><td>${featureDescriptions[f] || f}</td></tr>`).join('')}</tbody></table>
+                </div>
+            </div>`;
+        }
+
+        container.innerHTML = html;
+    }
+
+    const featureDescriptions = {
+        'attendance_rate': 'Ratio of days present (including late) to total school days',
+        'late_rate': 'Ratio of late arrivals to total school days',
+        'absence_trend': 'Change in absence frequency (positive = increasing absences)',
+        'avg_grade': 'Average percentage score across all subjects and assessments',
+        'grade_std': 'Standard deviation of scores — lower indicates more consistent performance',
+        'subjects_below_passing': 'Number of subjects where average score is below 75%',
+        'exam_quiz_gap': 'Difference between exam and quiz average scores (negative = worse on exams)',
+        'grade_trend': 'Change in scores from early to late assessments (negative = declining)',
+        'grade_level_encoded': 'Numeric grade level of the student',
+    };
+
+    function renderFeatureBars(importances) {
+        const entries = Object.entries(importances).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+        const maxVal = Math.max(...entries.map(e => Math.abs(e[1])));
+
+        return entries.map(([name, val]) => {
+            const pct = maxVal > 0 ? (Math.abs(val) / maxVal * 100) : 0;
+            return `<div class="feature-bar">
+                <span class="feature-name">${name}</span>
+                <div class="feature-bar-track"><div class="feature-bar-fill" style="width:${pct}%"></div></div>
+                <span class="feature-value">${(Math.abs(val) * 100).toFixed(1)}%</span>
+            </div>`;
+        }).join('');
+    }
+
+    // ─── Data Quality ────────────────────────────────────────────────────
+    function renderDataQuality() {
+        const dq = dashboardData.dataQuality;
+        if (!dq) return;
+
+        const container = document.getElementById('data-quality-container');
+        const reports = dq.reports || [];
+
+        let html = `<div style="background:var(--blue-light);border:1px solid #93C5FD;border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;font-size:13px;color:#1E40AF;">
+            <i class="fas fa-info-circle"></i>
+            Using synthetic demo data for development and testing. No real student data involved.
+        </div>`;
+
+        html += reports.map(r => `
+            <div class="panel" style="margin-bottom:16px;">
+                <div class="panel-header">
+                    <h3><i class="fas fa-table" style="color:var(--gray-400);margin-right:8px;"></i>${r.data_source}</h3>
+                    <span class="badge ${r.quality_score >= 0.95 ? 'badge-low' : r.quality_score >= 0.8 ? 'badge-medium' : 'badge-high'}">
+                        Quality: ${(r.quality_score * 100).toFixed(1)}%
+                    </span>
+                </div>
+                <div class="panel-body">
+                    <div class="metrics-row">
+                        <div class="metric-mini"><div class="label">Records</div><div class="value">${r.total_records.toLocaleString()}</div></div>
+                        <div class="metric-mini"><div class="label">Duplicates</div><div class="value">${r.duplicates}</div></div>
+                        <div class="metric-mini"><div class="label">Missing Fields</div><div class="value">${Object.keys(r.missing_fields).length}</div></div>
+                    </div>
+                    <div style="margin-top:12px;font-size:12px;color:var(--gray-500);">
+                        Columns: <code>${r.columns.join(', ')}</code>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        container.innerHTML = html;
+    }
+
+    // ─── Refresh ─────────────────────────────────────────────────────────
+    async function refreshData() {
+        // Destroy existing charts
+        Object.values(charts).forEach(c => c.destroy());
+        charts = {};
+
+        document.getElementById('overview-loading').style.display = 'flex';
+        document.getElementById('overview-content').style.display = 'none';
+
+        await loadAllData();
+    }
+
+    // ─── Init ────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', loadAllData);
+    </script>
+</body>
+</html>
